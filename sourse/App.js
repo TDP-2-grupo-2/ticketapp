@@ -14,6 +14,7 @@ import { Home } from './screens/Home';
 import { Calendar } from './screens/Calendar';
 import { MyTickets } from './screens/MyTickets';
 import { Favorites } from './screens/Favorites';
+import { EventDetail } from './screens/EventDetail';
 
 
 
@@ -29,8 +30,8 @@ function EventsStack() {
       <EventsStack.Screen name="Calendar" component={Calendar} headerShown={false} />
       <EventsStack.Screen name="MyTickets" component={MyTickets} options={{ headerShown: false }} />
       <EventsStack.Screen name="Favorites" component={Favorites} options={{ headerShown: false}}/>
-      {/* <EventsStack.Screen name="EventQR" component={EventQR} options={{ headerShown: false}}/>
-      <EventsStack.Screen name="ShowPeople" component={ShowPeople} options={{ headerShown: false}}/>
+      <EventsStack.Screen name="EventDetail" component={EventDetail} options={{ headerShown: false}}/>
+      {/* <EventsStack.Screen name="ShowPeople" component={ShowPeople} options={{ headerShown: false}}/>
       <EventsStack.Screen name="PeopleInEvent" component={FriendsAssistanceToEvent} options={{ headerShown: false}}/> */}
     </EventsStack.Navigator>
   )

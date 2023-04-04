@@ -1,3 +1,5 @@
+import { async } from "@firebase/util";
+
 export async function getEventsByCategories(categories){
     // const paramsGet = {
     //     method: "GET",
@@ -37,6 +39,10 @@ export async function getEventsByCategories(categories){
     // }  
     const Events = [{eventId:'2312dssa4' , eventName: 'Imagine Dragons', date: '27/12/2022', otherCategories: ['ROCK','DANCE' ] , imageURI:'sadsadsaa'} ]
     return Events;   
+}
+
+export async function getEventDetail(){
+    
 }
 
 export async function getFireBaseImage(image_path, setImage){

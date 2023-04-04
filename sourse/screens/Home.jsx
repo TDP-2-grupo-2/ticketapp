@@ -9,7 +9,7 @@ import Colors from '../constants/Colors';
 
 const categories = ['POP', 'STAND UP','MUESTRAS'];
 //const categories = [{tag:'POP'},{tag:'STAND UP'},{tag:'MUESTRAS'}];
-export const Home = () => {
+export const Home = (navigation) => {
  //   const [categories, setCategories] = useState( [{tag:'POP'},{tag:'STAND UP'},{tag:'MUESTRAS'}])
 
 
