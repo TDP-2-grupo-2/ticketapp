@@ -18,20 +18,12 @@ import { EventDetail } from './screens/EventDetail';
 import { NativeBaseProvider, Text, Box } from "native-base";
 
 
-
-
-
-
 function EventsStack() {
   const EventsStack = createNativeStackNavigator();
 
   return(
     <EventsStack.Navigator initialRouteName="Events" screenOptions={{ headerShown: false }} >
       <EventsStack.Screen name="Home" component={Home} headerShown={false} />
-      <EventsStack.Screen name="Calendar" component={Calendar} headerShown={false} />
-      <EventsStack.Screen name="MyTickets" component={MyTickets} options={{ headerShown: false }} />
-      <EventsStack.Screen name="Favorites" component={Favorites} options={{ headerShown: false}}/>
-      <EventsStack.Screen name="EventDetail" component={EventDetail} options={{ headerShown: false}}/>
       {/* <EventsStack.Screen name="ShowPeople" component={ShowPeople} options={{ headerShown: false}}/>
       <EventsStack.Screen name="PeopleInEvent" component={FriendsAssistanceToEvent} options={{ headerShown: false}}/> */}
     </EventsStack.Navigator>
@@ -129,7 +121,8 @@ export default function App() {
                 name="AuthStack" component={AuthenticatedBottomTab} options={{ headerShown: false }}
               />
             
-              
+            <MainStack.Screen name="EventDetail" component={EventDetail} options={{ headerShown: false}}/>
+
             
           </MainStack.Navigator>
           <StatusBar style="light" />

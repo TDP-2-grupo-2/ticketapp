@@ -81,7 +81,7 @@ export const SearchFilter = ({onSubmitFilters}) => {
             <View style={{justifyContent:'space-around' ,flexDirection:'row' }}>
             <Ionicons name='search-outline' color={Colors.WHITE} size={30} style={{width:'10%'}} />
             <TextInput  
-                style={{ fontSize: 18, backgroundColor: "#1D1D1D",  width: '70%', margin: 5, borderRadius:15}}
+                style={{ fontSize: 18,color:Colors.WHITE, backgroundColor: "#1D1D1D",  width: '70%', margin: 5, borderRadius:15}}
                 placeholder={"Nombre Evento..."}
                 placeholderTextColor="gray"
                 onChangeText={(value)=>{onSubmitFilters(value, filtros.eventType, filtros.taglist)}}

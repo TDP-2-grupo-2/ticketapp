@@ -21,5 +21,7 @@ export default {
     PURPLE_DARK:'#22112D',
     PURPLE_LIGTH:'#501C71',
     PURPLE_BUTTOM:'#7C51BE',
-    SOMBREADO: 'rgba(0, 0, 0, 0.2)'
+    SOMBREADO: 'rgba(0, 0, 0, 0.2)',
+    NAVTAB: 'rgba(18, 18, 18, 0.6)',
+    RED:'#B62D2D'
   }

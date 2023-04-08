@@ -6,24 +6,7 @@ import axios from "axios";
 
 
 export async function getEventsByCategories(setEvents,name, eventType,taglist ){
-    // const paramsGet = {
-    //     method: "GET",
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     },
-    //     // name: name,
-    //     // eventType:eventType,
-    //     // taglist:taglist,
-    // };
 
-
-    // const url = `${AppConstants.API_URL}/events/?eventType=${eventType}`;
-    // console.log(url)
-    // const response = await fetch(
-    //     url,
-    //     paramsGet
-    // );
-    // const jsonResponse = await response.json();
     params = {};
     if(name){
         params.name = name;
@@ -64,7 +47,9 @@ export async function getEventsByCategories(setEvents,name, eventType,taglist ){
                     //     tags.push(jsonResponse.data.message[i].tags[j]);
                     // }
                 }
-                
+                let date = jsonResponse.data.message[i].dateEvent.split('-');
+                let day = parseInt(date[2]) ;
+                let month = parseInt(date[1]);
                 Events.push({
                     eventId: jsonResponse.data.message[i]._id.$oid,
                    // id: jsonResponse.data.message[i].key,
@@ -79,7 +64,9 @@ export async function getEventsByCategories(setEvents,name, eventType,taglist ){
                     tags: jsonResponse.data.message[i].tags,
                     //owner: jsonResponse.data.message[i].owner,
                     image: imageURI,
-                    //eventType: jsonResponse.data.message[i].eventType,
+                    eventType: jsonResponse.data.message[i].eventType,
+                    day: day,
+                    month: month
                 });
             }
         }
@@ -87,9 +74,6 @@ export async function getEventsByCategories(setEvents,name, eventType,taglist ){
     setEvents(Events)  
 }
 
-export async function getEventDetail(){
-    
-}
 
 export async function getFireBaseImageWithSetImage(image_path, setImage){
     let imageURI;

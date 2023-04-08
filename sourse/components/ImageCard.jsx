@@ -17,7 +17,7 @@ export const ImageCard = ({event}) => {
     }, [])
 
     const onCardPress = () => {
-      navigation.navigate('EventDetail', event);  
+      navigation.navigate('EventDetail', event.eventId);  
   }
 
 
@@ -29,8 +29,8 @@ export const ImageCard = ({event}) => {
     </Image>
     <View style={{position: 'absolute', top: 0, left: 0, right: 0, bottom: 0}}>
     
-   <Text  style={{color:Colors.WHITE, position:"absolute",fontSize:24, top: 200, left:15 ,borderRadius:17,backgroundColor:Colors.SOMBREADO}}>{event.eventName}</Text>
-    <SmallCalendar date={event.dateEvent}  style={{top: 10, left:180}}></SmallCalendar>
+   <Text  style={{color:Colors.WHITE, position:"absolute",fontSize:24, top: 200, left:15 ,backgroundColor:Colors.SOMBREADO,fontWeight:'bold'}}>{event.eventName}</Text>
+    <SmallCalendar day={event.day} month={event.month}  style={{top: 10, left:180}}></SmallCalendar>
     {/* <View>
       {
          event.tags?
