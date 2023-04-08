@@ -7,7 +7,9 @@ import { ImageCard } from './ImageCard'
 export const CategoryList = ({category}) => {
     const [events, setEvents] = useState([{eventId:'2312dssa4' , eventName: 'Imagine Dragons', date: '27/12/2022', otherCategories: ['ROCK','DANCE' ] , imageURI:'sadsadsaa'} ])
     useEffect(() => {
-       //setEvents(getEventsByCategories(category));
+        
+       getEventsByCategories(setEvents ,null,category,null);
+       
     }, [])
     return (
     <View>

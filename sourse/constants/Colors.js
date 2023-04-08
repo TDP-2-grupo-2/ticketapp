@@ -17,4 +17,9 @@ export default {
     TABBAR_ACTIVE:'#FFFFFF',
     TABBAR_INACTTIVE: '#9e999e',
     TEXT_SEC: 'rgba(255, 255, 255, 0.5)',
+    PURPLE:'rgba(49, 18, 68, 0.90)',
+    PURPLE_DARK:'#22112D',
+    PURPLE_LIGTH:'#501C71',
+    PURPLE_BUTTOM:'#7C51BE',
+    SOMBREADO: 'rgba(0, 0, 0, 0.2)'
   }

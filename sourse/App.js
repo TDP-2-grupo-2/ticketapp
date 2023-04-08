@@ -15,6 +15,7 @@ import { Calendar } from './screens/Calendar';
 import { MyTickets } from './screens/MyTickets';
 import { Favorites } from './screens/Favorites';
 import { EventDetail } from './screens/EventDetail';
+import { NativeBaseProvider, Text, Box } from "native-base";
 
 
 
@@ -60,7 +61,7 @@ function AuthenticatedBottomTab() {
           elevation: 30,
           backgroundColor: Colors.TABBAR,
           borderTopWidth: 0,
-          opacity:'50%'
+          opacity:50
         }
       }}
     >
@@ -117,8 +118,11 @@ export default function App() {
   }, []);
 
   return (
-
+        <NativeBaseProvider>
         <NavigationContainer >
+              
+
+    
           <MainStack.Navigator >
              
               <MainStack.Screen 
@@ -130,5 +134,6 @@ export default function App() {
           </MainStack.Navigator>
           <StatusBar style="light" />
         </NavigationContainer>
+        </NativeBaseProvider>
   );
 }

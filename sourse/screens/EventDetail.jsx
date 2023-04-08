@@ -4,16 +4,16 @@ import Colors from '../constants/Colors'
 import { getFireBaseImage } from '../presenters/HomePresenter';
 import { SmallCalendar } from '../components/SmallCalendar';
 import { LinearGradient } from 'expo-linear-gradient';
-import Chip from '@mui/material/Chip';
+import { Avatar } from "native-base";
 import Stack from '@mui/material/Stack';
 
 export const EventDetail = ({route}) => {
-    const [image, setImage] = useState('');
+    const [image, setImage] = useState("https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-1-scaled.png");
     const event = route.params;
 
     useEffect(() => {
        // getEventDetail()
-       getFireBaseImage(event.imageURI, setImage);
+       //getFireBaseImage(event.imageURI, setImage);
     }, [])
     
   return (
@@ -46,10 +46,10 @@ export const EventDetail = ({route}) => {
    </View>
    
    <View style={{marginHorizontal:10}}>
-   {/* <Stack direction="row" spacing={1}>
-      <Chip label="Chip Filled" />
-      <Chip label="Chip Outlined" variant="outlined" />
-    </Stack> */}
+   <Avatar bg="green.500" source={{
+      uri: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80"
+    }}> AJ
+    </Avatar>
    
 
    <Text style={{color:Colors.WHITE, fontSize:20,  marginTop:20, marginBottom:10}}>Descripción</Text>

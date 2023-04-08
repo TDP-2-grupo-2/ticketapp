@@ -4,41 +4,43 @@ import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry'
 import { CategoryList } from '../components/CategoryList';
 import Colors from '../constants/Colors';
 
+import { ProfileHeader } from '../components/ProfileHeader';
+import { SearchFilter } from '../components/SearchFilter';
+import { ListSearchCards } from '../components/ListSearchCards';
 
 
-
-const categories = ['POP', 'STAND UP','MUESTRAS'];
+const categories = ['CONCIERTO','TEATRO','SHOW','CINE'];
 //const categories = [{tag:'POP'},{tag:'STAND UP'},{tag:'MUESTRAS'}];
 export const Home = (navigation) => {
  //   const [categories, setCategories] = useState( [{tag:'POP'},{tag:'STAND UP'},{tag:'MUESTRAS'}])
 
+    const [filtros, setFiltros] = useState({
+        'name':null,
+        'eventType':null,
+        'taglist':null,
+    })
+    const onSubmitFilters = (name, eventType, taglist) => {
 
-
+        setFiltros({
+            'name':name,
+            'eventType':eventType,
+            'taglist':taglist,
+        });
+        console.log(filtros)
+    }
 
   return (
     <View style={{paddingTop:'20%', backgroundColor: Colors.BLACK, height:'100%'}}>
         <View style={{marginHorizontal: 18}}>
-            <View style={{ justifyContent:'space-between'}}>
+           
+        <ProfileHeader></ProfileHeader>
+        <SearchFilter onSubmitFilters = {onSubmitFilters}></SearchFilter>
 
-            <Text style={{color:Colors.WHITE}}>Argentina</Text>
-
-            <Text style={{color:Colors.WHITE, fontSize:36}}>Explorar</Text>
-            </View>
-            <View>
-
-            <TextInput
-                style={{ fontSize: 18, backgroundColor: "#1D1D1D", padding: 15, width: '90%', margin: 20, borderRadius:15}}
-                placeholder={"Search..."}
-                placeholderTextColor="gray"/>
-                
-         
-            </View>
-            
-
-            <ScrollView>
+            <ScrollView style={{marginBottom:'40%'}}>
                 {
-                //<Text>{categories}</Text>
-                // categories.map((category) => <Text style={{color:Colors.WHITE}}>{category}</Text>)
+                (filtros.name || filtros.eventType)?
+                <ListSearchCards filtros ={filtros}></ListSearchCards>
+                :
                 categories.map(category => <CategoryList key={category}  category = {category}/>)
                 }
             </ScrollView>
