@@ -7,6 +7,7 @@ import Colors from '../constants/Colors';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
 import EVENT_CATEGORIES from '../constants/AppConstants'
+import DebouncedInput from './DebouncedInput';
 
 
 const categories = ['CONCIERTO','TEATRO','SHOW','CINE'];
@@ -73,6 +74,7 @@ export const SearchFilter = ({onSubmitFilters}) => {
         onSubmitFilters(filtros.name, filtros.eventType, filtros.taglist);
         onPressButton();
     }
+
     //onSubmitFilters(value, filtros.eventType, filtros.tag)
   return (
     <View  
@@ -84,9 +86,10 @@ export const SearchFilter = ({onSubmitFilters}) => {
                 style={{ fontSize: 18,color:Colors.WHITE, backgroundColor: "#1D1D1D",  width: '70%', margin: 5, borderRadius:15}}
                 placeholder={"Nombre Evento..."}
                 placeholderTextColor="gray"
-                onChangeText={(value)=>{onSubmitFilters(value, filtros.eventType, filtros.taglist)}}
+                onChangeText={(value) => {onSubmitFilters(value, null, null)}}
                 />
-                
+            
+            {/* <DebouncedInput onChange={(value)=>{onSubmitFilters(value, filtros.eventType, filtros.taglist)}} delay={1000} /> */}
             <Ionicons name='options-outline' color={Colors.WHITE} size={30} onPress={onPressButton} style={{width:'10%'}}/>
             </View>
             

@@ -6,7 +6,6 @@ import axios from "axios";
 
 
 export async function getEventsByCategories(setEvents,name, eventType,taglist ){
-
     params = {};
     if(name){
         params.name = name;
@@ -52,17 +51,10 @@ export async function getEventsByCategories(setEvents,name, eventType,taglist ){
                 let month = parseInt(date[1]);
                 Events.push({
                     eventId: jsonResponse.data.message[i]._id.$oid,
-                   // id: jsonResponse.data.message[i].key,
                     eventName: jsonResponse.data.message[i].name,
-                    //imageURI: jsonResponse.data.message[i].photos ? jsonResponse.data.message[i].photos[0] : null,
-                    // isoStringDate: jsonResponse.data.message[i].eventDates[0],
-                    // date: `${date.getDate().toString().padStart(2, '0')} ${monthNames[date.getMonth()]}, ${date.getFullYear()}`,
-                    // time: `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`,
-                    //capacity: jsonResponse.data.message[i].capacity,
                     dateEvent: jsonResponse.data.message[i].dateEvent,
                     attendance:jsonResponse.data.message[i].attendance ,
                     tags: jsonResponse.data.message[i].tags,
-                    //owner: jsonResponse.data.message[i].owner,
                     image: imageURI,
                     eventType: jsonResponse.data.message[i].eventType,
                     day: day,
