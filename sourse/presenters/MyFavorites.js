@@ -1,57 +1,27 @@
-import { async } from "@firebase/util";
 import AppConstants from "../constants/AppConstants";
 import { getFirebaseImage } from '../utils/FirebaseHandler';
 
 import axios from "axios";
 
 
-export async function getEventsByCategories(setEvents,name, eventType,taglist,cordinates, range ){
-    params = {};
-    if(name){
-        params.name = name;
-    }
-    if(eventType){
-        params.eventType = eventType;
-    }
-    if(taglist){
-        params.taglist = taglist;
-    }
-    if(cordinates){
-        params.coordinates = cordinates;
-    }
-    if(range){
-        params.distances_range = range;
-    }
-    console.log(params)
+export async function getEvents(userId, setEvents ){
+
     
     const jsonResponse = await axios.get(
-        `${AppConstants.API_URL}/events/`,
-        {
-          params: params
-          
-        },
+        `${AppConstants.API_URL}/events/favourites/${userId}`,
     );
     const Events = [];
     if (jsonResponse.status === 200){
         if(!jsonResponse.status_code){
-            //console.log(jsonResponse.data.message.length)
             for(let i=0; i<jsonResponse.data.message.length; i++){
                 let imageURI;
-                
-                //console.log(jsonResponse.data.message[i].photos ? jsonResponse.data.message[i].photos[0]: null)
                     try{
                         imageURI = await getFirebaseImage("files/"+jsonResponse.data.message[i].photos[0]);
                     }catch(exception){
-                        //Image not available
                         imageURI = "https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-1-scaled.png";
                     }
                 let tags = [];
                 if (jsonResponse.data.message[i].tags){
-                    
-                    // for(let j=0; j<jsonResponse.data.message[i].tags.length; j++){
-                    //     console.log(jsonResponse.data.message[i].tags[j])
-                    //     tags.push(jsonResponse.data.message[i].tags[j]);
-                    // }
                 }
                 let name = jsonResponse.data.message[i].name
                 if (name.length > 20){
@@ -75,16 +45,4 @@ export async function getEventsByCategories(setEvents,name, eventType,taglist,co
         }
     } 
     setEvents(Events)  
-}
-
-
-export async function getFireBaseImageWithSetImage(image_path, setImage){
-    let imageURI;
-    try{
-        imageURI = await getFireBaseImage(image_path);
-    }catch(exception){
-        //Image not available
-        imageURI = "https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-1-scaled.png";
-    }
-    setImage(imageURI)
 }

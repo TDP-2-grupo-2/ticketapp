@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useContext, useState } from 'react'
+
 import { NavigationContainer } from '@react-navigation/native';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -15,22 +16,18 @@ import { Calendar } from './screens/Calendar';
 import { MyTickets } from './screens/MyTickets';
 import { Favorites } from './screens/Favorites';
 import { EventDetail } from './screens/EventDetail';
-
-
-
-
+import { NativeBaseProvider, Text, Box } from "native-base";
+import { isLoggedIn, LoginContext } from './context/LoginContext';
+import { LogginScreen } from './screens/LogginScreen';
+import { TicketQr } from './screens/TicketQr';
 
 
 function EventsStack() {
   const EventsStack = createNativeStackNavigator();
-
+  
   return(
     <EventsStack.Navigator initialRouteName="Events" screenOptions={{ headerShown: false }} >
       <EventsStack.Screen name="Home" component={Home} headerShown={false} />
-      <EventsStack.Screen name="Calendar" component={Calendar} headerShown={false} />
-      <EventsStack.Screen name="MyTickets" component={MyTickets} options={{ headerShown: false }} />
-      <EventsStack.Screen name="Favorites" component={Favorites} options={{ headerShown: false}}/>
-      <EventsStack.Screen name="EventDetail" component={EventDetail} options={{ headerShown: false}}/>
       {/* <EventsStack.Screen name="ShowPeople" component={ShowPeople} options={{ headerShown: false}}/>
       <EventsStack.Screen name="PeopleInEvent" component={FriendsAssistanceToEvent} options={{ headerShown: false}}/> */}
     </EventsStack.Navigator>
@@ -39,17 +36,6 @@ function EventsStack() {
 
 function AuthenticatedBottomTab() {
   const AuthTab = createBottomTabNavigator();
-
-  // const TabBarFloatingButton = (props) => {
-  //   return (
-  //     <View style={{ position: 'relative', alignItems: 'center' }} pointerEvents="box-none">
-  //       <TouchableOpacity style={{ top: -15, borderRadius: 50, backgroundColor: Colors.PRIMARY, height: 60, width: 60, alignItems: 'center', justifyContent: 'center' }} onPress={props.onPress} >
-  //         <Entypo name="plus" color={Colors.WHITE} size={35} style={{ fontWeight: 'bold' }} />
-  //       </TouchableOpacity>
-  //     </View>
-  //   )
-  // }
-
   return (
     <AuthTab.Navigator
       screenOptions={{
@@ -60,10 +46,18 @@ function AuthenticatedBottomTab() {
           elevation: 30,
           backgroundColor: Colors.TABBAR,
           borderTopWidth: 0,
-          opacity:'50%'
+          opacity:50
         }
       }}
     >
+            <AuthTab.Screen
+        name="Favorites"
+        component={Favorites}
+        options={{
+					tabBarIcon: ({ focused, color, size }) => <Ionicons name='heart-outline' color={color} size={size} />,
+          headerShown: false
+				}}
+      />
       <AuthTab.Screen
         name="EventsStack"
         component={EventsStack}
@@ -72,14 +66,7 @@ function AuthenticatedBottomTab() {
           headerShown: false
 				}}
       />
-      <AuthTab.Screen
-        name="Calendar"
-        component={Calendar}
-        options={{
-					tabBarIcon: ({ focused, color, size }) => <Ionicons name="calendar-outline" color={color} size={size} />,
-          headerShown: false
-				}}
-      />
+
       <AuthTab.Screen
         name="MyTickets"
         component={MyTickets}
@@ -89,23 +76,18 @@ function AuthenticatedBottomTab() {
           headerShown: false
 				}}
       />
-      <AuthTab.Screen
-        name="Favorites"
-        component={Favorites}
-        options={{
-					tabBarIcon: ({ focused, color, size }) => <Ionicons name='heart-outline' color={color} size={size} />,
-          headerShown: false
-				}}
-      />
+
     </AuthTab.Navigator>
   )
 }
 
 const MainStack = createNativeStackNavigator();
 
+const notAuthenticatedNavigator = createNativeStackNavigator();
+
 export default function App() {
-
-
+  const islogged = useContext(LoginContext);
+  const [authenticated, setAuthenticated] = useState(null);
   useEffect(() => {
     // Session.getInstance().load()
     // .then(session => {
@@ -117,18 +99,31 @@ export default function App() {
   }, []);
 
   return (
+    <LoginContext.Provider value={{ authenticated, setAuthenticated }}>
+      <NativeBaseProvider>
+          
+          <NavigationContainer >
+            {authenticated ? 
+                        <MainStack.Navigator >
+                        <MainStack.Screen 
+                          name="AuthStack" component={AuthenticatedBottomTab} options={{ headerShown: false }}
+                        />
+                      <MainStack.Screen name="EventDetail" component={EventDetail} options={{ headerShown: false}}/>
+                      <MainStack.Screen name="VerQR" component={TicketQr} options={{ headerShown: false}}/>
 
-        <NavigationContainer >
-          <MainStack.Navigator >
-             
-              <MainStack.Screen 
-                name="AuthStack" component={AuthenticatedBottomTab} options={{ headerShown: false }}
-              />
-            
+                    </MainStack.Navigator>
+            :
+              <notAuthenticatedNavigator.Navigator screenOptions={{ headerShown: false }}>
+                <notAuthenticatedNavigator.Screen name="Loggin" component={LogginScreen}  options={{ }}/>
+                              
+              </notAuthenticatedNavigator.Navigator>
               
-            
-          </MainStack.Navigator>
-          <StatusBar style="light" />
-        </NavigationContainer>
+            }
+            <StatusBar style="light" />
+          </NavigationContainer>
+          </NativeBaseProvider>
+      
+    </LoginContext.Provider>
+        
   );
 }
