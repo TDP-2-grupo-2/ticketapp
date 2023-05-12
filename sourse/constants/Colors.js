@@ -23,5 +23,9 @@ export default {
     PURPLE_BUTTOM:'#7C51BE',
     SOMBREADO: 'rgba(0, 0, 0, 0.2)',
     NAVTAB: 'rgba(18, 18, 18, 0.6)',
-    RED:'#B62D2D'
+    RED:'#B62D2D',
+    WHITE_TRASPARENT: 'rgba(255, 255, 255, 0.18)',
+    BACKGROUND_TICKETS:'#041C39',
+    BACKGROUND_FAVORITES: '#330627',
+    TICKET_BUTTOM: '#BF1AC2'
   }
