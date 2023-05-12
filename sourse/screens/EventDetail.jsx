@@ -1,21 +1,28 @@
-import React, { useEffect, useState } from 'react'
-import { Button, Image, ImageBackground, ScrollView, Text, View } from 'react-native'
+import React, { useEffect, useState ,useContext} from 'react'
+import { Button, Image, ImageBackground, ScrollView, StyleSheet, Text, View } from 'react-native'
 import Colors from '../constants/Colors'
 import { getFireBaseImage } from '../presenters/HomePresenter';
 import { SmallCalendar } from '../components/SmallCalendar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Avatar } from "native-base";
 import Stack from '@mui/material/Stack';
-import { getEvent } from '../presenters/EventDetail';
+import { getEvent , reserveTicket, getTicket, pachIsFavorite, getIsFavorite} from '../presenters/EventDetail';
 import { TouchableHighlight } from 'react-native';
 import { TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Fontisto } from '@expo/vector-icons'; 
 import { FrequentQuestion } from '../components/FrequentQuestion';
-import MapView from 'react-native-maps';
-
+import MapView, { UrlTile } from 'react-native-maps';
+import { Feather } from '@expo/vector-icons'; 
 import {Marker} from 'react-native-maps';
+import { ModalAccept } from '../components/ModalAccept';
+import { LoginContext } from '../context/LoginContext';
+import { AgendaItem } from '../components/AgendaItem';
+
+import MapboxGL from '@rnmapbox/maps';
+
+MapboxGL.setAccessToken('pk.eyJ1IjoicmFtaXJvLXNhbmNoZXoiLCJhIjoiY2xndjlkc3YzMG80NTNwa2xsc3FudGloaSJ9.Fr6JzzPfoSbp-UnxuEr_HA');
 
 const SeccionStyle = {
   marginVertical: 10,
@@ -24,7 +31,11 @@ const SeccionStyle = {
 
 const TitleStyle = {
   marginVertical: 10,
-  color:Colors.WHITE, fontSize:20,  marginTop:20, marginBottom:10
+  color:Colors.WHITE, 
+  fontSize:20,  
+  marginTop:20, 
+  marginBottom:10,
+  fontWeight:'bold'
 }
 
 const NavbarStyle ={
@@ -39,7 +50,6 @@ const NavbarStyle ={
   paddingBottom: 20,
   paddingTop: 10,
   alignItems:'center'
-   
 }
 
 const ButtomStyle = {
@@ -63,22 +73,51 @@ const whithNoVacants ={
 const ButtonBlock = {
   backgroundColor:Colors.RED,
 }
+
+const image = "https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-1-scaled.png";
 export const EventDetail = ({route}) => {
     const navigator = useNavigation();
     //const event = route.params;
     const [event, setEvent] = useState({})
-    const [fecha, setFecha] = useState('2023-12-3')
-    useEffect(() => {
-      
-       getEvent(setEvent, route.params)
+    const [fecha, setFecha] = useState('2023-12-3');
+    const [toggle, setToggle] = useState(false);
+    const [ticket, setTicket] = useState({});
+    const { authenticated } = useContext(LoginContext);
+    const [isFavorite, setIsFavorite] = useState(false);
+
+    const initDetail = async () => {
+      await getEvent(setEvent, route.params)
+
+
+      //getTicket()
+    }
+    useEffect( () => {
+       initDetail()
     }, [])
     
     useEffect(() => {
-      
-      setFecha(event.dateEvent)
-      
+      if(event.eventId){
+        setFecha(event.dateEvent)
+        getIsFavorite(authenticated.token,event.eventId, setIsFavorite);
+        getTicket(authenticated.token,event.eventId, setTicket);
+      }
+
     }, [event])
+
+
     
+    
+    const reserveNewTicket = async () =>{
+      reserveTicket(authenticated.token,event.eventId, setTicket);
+      setToggle(true) //ver de cambiar 
+    }
+    const onFavoritePress = async () => {
+      pachIsFavorite(authenticated.token,event.eventId, setIsFavorite);
+    }
+
+    const verTicket = () => {
+      navigator.navigate('VerQR', {...ticket, eventName: event.eventName,start:event.start ,end:event.end,day:event.day,month:event.month })
+    }
 
   return (
     <View>
@@ -87,7 +126,7 @@ export const EventDetail = ({route}) => {
     
     <ImageBackground
     style={{width : '100%', height: 300}}
-    source={{uri : event.image}}>
+    source={event.image?{uri : event.image}: {uri : image}}>
 
     <LinearGradient 
         colors={['#00000000', Colors.BLACK]} 
@@ -103,6 +142,11 @@ export const EventDetail = ({route}) => {
           <Text  style={{color:Colors.WHITE, fontSize:30}}>{event.eventName}</Text>
           <Text  style={{color:Colors.TEXT_SEC, fontSize:13}}>Desde: {event.start} hasta: {event.end}</Text>
         </View>
+        <TouchableOpacity style={{ marginLeft:20,paddingHorizontal:10,
+                    paddingVertical:5, backgroundColor:Colors.SOMBREADO,
+                    borderRadius:15,}}> 
+          <Feather  name="flag" size={30} />
+        </TouchableOpacity>
         <SmallCalendar day={event.day} month={event.month}  ></SmallCalendar>
         </View>
     </View>
@@ -115,27 +159,24 @@ export const EventDetail = ({route}) => {
    </Text>
 
    <Text style={[TitleStyle]}>Locación</Text>
-   <View style={{ marginLeft:'5%', borderRadius:20}}>
-    <MapView
-      style={{width: '95%',
-      height: 100,borderRadius:20}}
-      initialRegion={{
-      latitude:   event.latitud,
-      longitude:  event.longitud,
-      latitudeDelta: 0.0122,
-      longitudeDelta: 0.0121,
-      }}
-      
-      >
 
-      <Marker
-      key={event.eventId}
-      coordinate={{latitude: event.latitud, longitude: event.longitud}}
-      title={event.eventName}
-      
-    />
-      </MapView>
-   </View>
+   {event.longitud? 
+         <View style={styles.page}>
+         <View style={styles.container}>
+           <MapboxGL.MapView style={styles.map} 
+            >
+                          <MapboxGL.Camera
+              zoomLevel={14}
+              centerCoordinate={[event.longitud, event.latitud]}
+            />
+            <MapboxGL.PointAnnotation id={event.eventId} coordinate={[event.longitud, event.latitud]} />
+          
+            </MapboxGL.MapView>
+         </View>
+       </View>
+    :
+    <></>
+  }
 
    {/* <Image style={{ height: 100, borderRadius:20}} source={{ uri: event.image }}> 
     </Image> */}
@@ -147,14 +188,25 @@ export const EventDetail = ({route}) => {
 
     <Text style={[TitleStyle]}>Organizador</Text>
   <View style={[SeccionStyle,{flexDirection:'row', alignItems:"center"}]}>
+  <Ionicons  name='person'  style={{marginHorizontal:5}} color={Colors.WHITE} size={20}></Ionicons>
 
-  <Avatar bg="green.500" source={{
-      uri: "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
-    }}> AJ
-    </Avatar>
+ 
     <Text style={{color:Colors.WHITE, fontSize:16, margin:10}}>{event.owner}</Text>
     </View>
 
+
+    {event.agenda ? 
+        <>
+                  <Text style={[TitleStyle,{color:Colors.WHITE, fontSize:20, marginTop:20,marginBottom:10}]}>Agenda</Text>
+          <View style={{marginBottom:'5%'}} >
+      {event.agenda.map((agendaItem) =>  <AgendaItem key={agendaItem.horario} horario={agendaItem.horario} descripcion={agendaItem.descripcion}></AgendaItem>)}
+      </View>
+        </>
+      :
+      <></>
+      
+      }
+   
    <Text style={[TitleStyle,{color:Colors.WHITE, fontSize:20, marginTop:20,marginBottom:10}]}>Preguntas Frecuentes</Text>
    <View style={{marginBottom:'40%'}} >
     {event.faqs ? 
@@ -183,8 +235,8 @@ export const EventDetail = ({route}) => {
     <View style={{ marginRight:20,paddingHorizontal:10,
                    paddingVertical:5, backgroundColor:Colors.SOMBREADO,
                     borderRadius:15, flexDirection:'row'}}>
-    <TouchableOpacity   >
-      <Ionicons  name="heart-outline" style={{marginRight:10}} color={Colors.WHITE} size={30}></Ionicons>
+    <TouchableOpacity  onPress={() =>{onFavoritePress()}} >
+      <Ionicons  name={isFavorite? "heart":"heart-outline"}  style={{marginRight:10}} color={Colors.WHITE} size={30}></Ionicons>
     </TouchableOpacity>
     <TouchableOpacity  >
       <Ionicons  name="paper-plane-outline" color={Colors.WHITE} size={30}></Ionicons>
@@ -192,23 +244,56 @@ export const EventDetail = ({route}) => {
     </View>
     
     </View>
+    <ModalAccept toggle={toggle} setToggle = {setToggle}></ModalAccept>
     
+    {event.capacity? 
     <View style={[NavbarStyle,{}]}>
-      <View style={{marginLeft:'10%'}}>
-        <Text style={event.capacity > event.attendance?whithVacants :whithNoVacants }>Vacantes</Text>
-        <Text style={event.capacity > event.attendance?whithVacants :whithNoVacants }>{event.attendance +'/'+event.capacity}</Text>
-      </View>
-      
-      <TouchableOpacity style={[ButtomStyle,event.capacity < event.attendance ? ButtonBlock:{}, {flexDirection:"row", justifyContent: "center"}]}>
-      <Text style={{color:Colors.WHITE ,marginHorizontal:10}} >{event.capacity > event.attendance ? 'Adquirir Ticket': 'Tickets Agotados'}</Text>
+    <View style={{marginLeft:'10%'}}>
+      <Text style={event.capacity > event.attendance?whithVacants :whithNoVacants }>Vacantes</Text>
+      <Text style={event.capacity > event.attendance?whithVacants :whithNoVacants }>{event.attendance +'/'+event.capacity}</Text>
+    </View>
+    {
+      ticket.ticketId?//aca hay q cambiar por si tiene ticket
+      <TouchableOpacity onPress={verTicket} style={[ButtomStyle,{ backgroundColor:Colors.TICKET_BUTTOM}, {flexDirection:"row", justifyContent: "center"}]}>
+      <Text style={{color:Colors.WHITE ,marginHorizontal:10}} >Ver entrada</Text>
+      <Fontisto name='qrcode' size={24} color="white" />
+      </TouchableOpacity>
+      :
+      <TouchableOpacity 
+        style={[ButtomStyle,event.capacity < event.attendance ? ButtonBlock:{}, 
+        {flexDirection:"row", justifyContent: "center"}]}
+        onPress= { () => reserveNewTicket()}
+      >
+      <Text style={{color:Colors.WHITE ,marginHorizontal:10}} >
+        {event.capacity > event.attendance ? 'Adquirir Ticket': 'Tickets Agotados'}
+      </Text>
       <Fontisto name={event.capacity > event.attendance ? 'ticket': 'confused'} size={24} color="white" />
-      {/* <Ionicons color={Colors.WHITE} size={30}></Ionicons> */}
       </TouchableOpacity>
       
-      {/* <LinearGradient 
-        colors={['#00000000', Colors.TABBAR]} 
-        style={{height : '100%', width : '100%'}}/> */}
-    </View>
+
+    }
+    
+    
+
+  </View>
+    :
+    <></>}
+    
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  page: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  container: {
+    height: 150,
+    width: '100%',
+  },
+  map: {
+    flex: 1
+  }
+});

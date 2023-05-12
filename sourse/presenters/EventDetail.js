@@ -1,6 +1,7 @@
 import AppConstants from "../constants/AppConstants";
 import { getFirebaseImage } from '../utils/FirebaseHandler';
 import axios from "axios";
+import { ConstructionOutlined } from "@mui/icons-material";
 
 
 export async function getEvent(setEvents,eventId ){
@@ -8,6 +9,7 @@ export async function getEvent(setEvents,eventId ){
         `${AppConstants.API_URL}/events/${eventId}`,
     );
     const Events = [];
+
     if (jsonResponse.status === 200){
         if(!jsonResponse.status_code){
                 let imageURI;
@@ -28,13 +30,14 @@ export async function getEvent(setEvents,eventId ){
                     // }
                 }
                 let startTime = jsonResponse.data.message.start.split(':');
-                startTime = startTime[0]+ ':'+ startTime[0];
+                startTime = startTime[0]+ ':'+ startTime[1];
                 let endTime = jsonResponse.data.message.end.split(':');
-                endTime = endTime[0]+ ':'+ endTime[0];
+                endTime = endTime[0]+ ':'+ endTime[1];
 
                 let date = jsonResponse.data.message.dateEvent.split('-');
                 let day = parseInt(date[2]) ;
                 let month = parseInt(date[1]);
+
                 setEvents({
                     eventId: jsonResponse.data.message._id.$oid,
                     eventName: jsonResponse.data.message.name,
@@ -50,6 +53,7 @@ export async function getEvent(setEvents,eventId ){
                     image: imageURI,
                     eventType: jsonResponse.data.message.eventType,
                     faqs:jsonResponse.data.message.faqs,
+                    agenda:jsonResponse.data.message.agenda,
                     latitud: jsonResponse.data.message.latitud,
                     longitud: jsonResponse.data.message.longitud,
                     start: startTime,
@@ -63,4 +67,62 @@ export async function getEvent(setEvents,eventId ){
         }
     }
     
+}
+
+export async function reserveTicket(userId, eventId,setTicket ){
+    const jsonResponse = await axios.post(
+        `${AppConstants.API_URL}/events/reservations/user/${userId}/event/${eventId}`,//cambiar x el optener
+    )
+    .then(function (jsonResponse) {
+        setTicket({ticketId: jsonResponse.data.message._id.$oid});
+      })
+      .catch(function (error) {
+        console.log('error')
+        // handle error
+            setTicket({})
+      })
+      ;
+}
+
+export async function getTicket(userId, eventId, setTicket){
+    console.log("consulto");
+
+    const jsonResponse = await axios.get(
+        `${AppConstants.API_URL}/events/reservations/user/${userId}/event/${eventId}`,//cambiar x el optener
+    )
+    .then(function (jsonResponse) {
+        //console.log(jsonResponse.data.message._id.$oid);
+
+        setTicket({ticketId: jsonResponse.data.message._id.$oid});
+      })
+      .catch(function (error) {
+        console.log('error')
+        // handle error
+            setTicket({})
+      })
+      ;
+    
+
+}
+
+export async function getIsFavorite(userId, eventId, setFavorite){
+    const jsonResponse = await axios.get(
+        `${AppConstants.API_URL}/events/favourites/${eventId}/user/${userId}`,//cambiar x el optener
+    );
+    if (jsonResponse.status === 200){
+        if(!jsonResponse.status_code){
+            setFavorite(jsonResponse.data.message) ;
+        }
+    }
+}
+
+export async function pachIsFavorite(userId, eventId, setFavorite){
+    const jsonResponse = await axios.patch(
+        `${AppConstants.API_URL}/events/favourites/${eventId}/user/${userId}`,//cambiar x el optener
+    );
+    if (jsonResponse.status === 200){
+        if(!jsonResponse.status_code){
+            setFavorite(jsonResponse.data.message == "Se agregó como favorito el evento") ;
+        }
+    }
 }
