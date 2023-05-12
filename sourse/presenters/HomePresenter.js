@@ -5,7 +5,7 @@ import { getFirebaseImage } from '../utils/FirebaseHandler';
 import axios from "axios";
 
 
-export async function getEventsByCategories(setEvents,name, eventType,taglist ){
+export async function getEventsByCategories(setEvents,name, eventType,taglist,cordinates, range ){
     params = {};
     if(name){
         params.name = name;
@@ -16,6 +16,13 @@ export async function getEventsByCategories(setEvents,name, eventType,taglist ){
     if(taglist){
         params.taglist = taglist;
     }
+    if(cordinates){
+        params.coordinates = cordinates;
+    }
+    if(range){
+        params.distances_range = range;
+    }
+    console.log(params)
     
     const jsonResponse = await axios.get(
         `${AppConstants.API_URL}/events/`,
@@ -46,12 +53,16 @@ export async function getEventsByCategories(setEvents,name, eventType,taglist ){
                     //     tags.push(jsonResponse.data.message[i].tags[j]);
                     // }
                 }
+                let name = jsonResponse.data.message[i].name
+                if (name.length > 20){
+                    name = name.slice(0,17)+'...';
+                }
                 let date = jsonResponse.data.message[i].dateEvent.split('-');
                 let day = parseInt(date[2]) ;
                 let month = parseInt(date[1]);
                 Events.push({
                     eventId: jsonResponse.data.message[i]._id.$oid,
-                    eventName: jsonResponse.data.message[i].name,
+                    eventName: name,
                     dateEvent: jsonResponse.data.message[i].dateEvent,
                     attendance:jsonResponse.data.message[i].attendance ,
                     tags: jsonResponse.data.message[i].tags,
@@ -62,7 +73,7 @@ export async function getEventsByCategories(setEvents,name, eventType,taglist ){
                 });
             }
         }
-    }  
+    } 
     setEvents(Events)  
 }
 
