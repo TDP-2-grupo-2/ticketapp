@@ -25,7 +25,7 @@ export const ImageCard = ({event}) => {
     
     <View style={{borderRadius:30 ,marginHorizontal:10}}> 
     <TouchableOpacity onPress={onCardPress}>
-    <Image style={{ height: 250, width:250, borderRadius:20}} source={{ uri: event.image }}> 
+    <Image style={{ height: 250, width:250, borderRadius:20}} source={event.image?{ uri: event.image }:{ uri: image }}> 
     </Image>
     <View style={{position: 'absolute', top: 0, left: 0, right: 0, bottom: 0}}>
     

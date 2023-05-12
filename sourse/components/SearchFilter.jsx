@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { View,Text, TextInput, Modal, Button } from 'react-native'
+import { View,Text, TextInput, Modal, Button, TouchableOpacity, StyleSheet } from 'react-native'
 import {Picker} from '@react-native-picker/picker';
 import { Input, Avatar, InputLeftAddon, InputRightAddon, Stack, Center, NativeBaseProvider ,Icon} from "native-base";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -8,9 +8,10 @@ import Colors from '../constants/Colors';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import EVENT_CATEGORIES from '../constants/AppConstants'
 import DebouncedInput from './DebouncedInput';
+import {Slider} from '@miblanchard/react-native-slider';
+//import Slider from "react-native-a11y-slider";
 
-
-const categories = ['CONCIERTO','TEATRO','SHOW','CINE'];
+const categories = ['CONFERENCIA','CONCIERTO','TEATRO','SHOW','CINE','OTRO'];
 
 const ModalStyle = {width:'80%',
                     
@@ -54,7 +55,8 @@ const bottonStyle ={
     backgroundColor:Colors.PURPLE_BUTTOM,
     padding:10,
     paddingHorizontal:20,
-    margin:5
+    margin:5,
+    
 }
 
 export const SearchFilter = ({onSubmitFilters}) => {
@@ -66,12 +68,14 @@ export const SearchFilter = ({onSubmitFilters}) => {
         'taglist':null,
     })
 
+    const [filtroDistancia, setFiltroDistancia] = useState({min:0, max:500})
+
     const onPressButton = ()=> {
         setToggle(!toggle);
       };
 
     const onSubmit =() =>{
-        onSubmitFilters(filtros.name, filtros.eventType, filtros.taglist);
+        onSubmitFilters(filtros.name, filtros.eventType, filtros.taglist, `${filtroDistancia.min},${filtroDistancia.max}` );
         onPressButton();
     }
 
@@ -112,34 +116,56 @@ export const SearchFilter = ({onSubmitFilters}) => {
                     <Picker
                         selectedValue={filtros.eventType}
                         style={PickerStyle}
-                        itemStyle={{color:'#FFFFFF' }}
+                        itemStyle={{color:'#000000' }}
                         onValueChange={(itemValue, itemIndex) => setFiltros({...filtros,'eventType':itemValue})}
                     >
-                        <Picker.Item  key='null' label="Sin Seleccionar" value="" />
-                        {categories.map((category) => <Picker.Item key={category} style={{color:Colors.WHITE}} label={category} value={category} />)}
+                        <Picker.Item  key='null' label="SIN SELECCIONAR" value="" />
+                        {categories.map((category) => <Picker.Item key={category} style={{color:Colors.BLACK}} label={category} value={category} />)}
                     </Picker>
-                    <View style={{flexDirection:'row', justifyContent:'center',marginBottom:10}}>
-                        
-                    <View style={[bottonStyle , {backgroundColor:Colors.PURPLE_DARK}]}>
-                        <Button
-                        onPress={onPressButton}
-                        title="Cancelar"
-                        color={Colors.WHITE}
-                        accessibilityLabel="Cancelar busqueda"
-                        style={{padding:10, paddingHorizontal:20}}
-                        />
+                    <View style={{marginHorizontal:'8%'}}>
+                        <Text style={{color:Colors.WHITE, fontSize:20,marginBottom:15}}>Distancia:</Text>
+                        <View style={{justifyContent:'space-between', flexDirection:'row', }}>
+                        <Text style={{color:Colors.WHITE}}>Minima: {filtroDistancia.min}Km</Text>
+                        <Text style={{color:Colors.WHITE}}>Máxima: {filtroDistancia.max}Km</Text>
                         </View>
-                        <View style={bottonStyle}>
-                        <Button
-                        onPress={onSubmit}
-                        title="Aplicar"
-                        color={Colors.WHITE}
-                        accessibilityLabel="Buscar"
+                    </View>
+                    
+                    
+                    <View style={{marginHorizontal:'8%', marginVertical:10}}>
+
+
+                    
+                        <Slider
+                        maximumValue = {500}
+                        minimumValue = {0}
+                        maximumTrackTintColor ={Colors.BLACK}
+                        minimumTrackTintColor ={Colors.PURPLE_BUTTOM}
+                        thumbTintColor={Colors.PURPLE_BUTTOM}
+                        value= {[filtroDistancia.min, filtroDistancia.max]}
+                        step={10}
+                        onValueChange={value => {
+                            setFiltroDistancia({min:value[0], max:value[1]})
+                        }}
                         />
-                        </View>
-                        
                         
                     </View>
+                    
+
+                    <View style={{flexDirection:'row', justifyContent:'center',marginBottom:10}}>
+                        
+                        <TouchableOpacity  style={bottonStyle} onPress={onPressButton}>
+                            
+                            <Text style={{color:Colors.WHITE}}>Cancelar</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity 
+                            onPress={onSubmit} 
+                            style={bottonStyle}>
+                            <Text style={{color:Colors.WHITE}}>Aplicar</Text>
+                        </TouchableOpacity>    
+                        
+                    </View>
+                    
                 </View>
                 
             </Modal>
@@ -147,3 +173,13 @@ export const SearchFilter = ({onSubmitFilters}) => {
         </View>
   )
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        marginLeft: 10,
+        marginRight: 10,
+        marginVertical: 30,
+
+    },
+});
