@@ -1,6 +1,6 @@
-import React, { useEffect, useContext, useState } from 'react'
+import React, { useEffect, useContext, useState,useRef } from 'react'
 
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Entypo from '@expo/vector-icons/Entypo';
@@ -20,6 +20,12 @@ import { NativeBaseProvider, Text, Box } from "native-base";
 import { isLoggedIn, LoginContext } from './context/LoginContext';
 import { LogginScreen } from './screens/LogginScreen';
 import { TicketQr } from './screens/TicketQr';
+
+import * as Notifications from 'expo-notifications';
+import { NotificationContext } from './context/NotificationContext';
+import { TokenContext } from './context/TokenContext';
+import { registerDevice } from './presenters/Sesion';
+
 
 
 function EventsStack() {
@@ -88,21 +94,80 @@ const notAuthenticatedNavigator = createNativeStackNavigator();
 export default function App() {
   const islogged = useContext(LoginContext);
   const [authenticated, setAuthenticated] = useState(null);
-  useEffect(() => {
-    // Session.getInstance().load()
-    // .then(session => {
-    //   setAppAuthContext({
-    //     userSession: session,
-    //     favorites: []
-    //   })
-    // })
-  }, []);
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  //const navigation = useNavigation();
+  const [navigationRef, setNavigationRef] = useState(null)
+
+
+  const registerForPushNotificationsAsync = async () => {
+       let token
+       if (Platform.OS === 'android') {
+         await Notifications.setNotificationChannelAsync('default', {
+           name: 'default',
+           importance: Notifications.AndroidImportance.MAX,
+           vibrationPattern: [0, 250, 250, 250],
+           lightColor: '#FF231F7C',
+         });
+       
+        const { status: existingStatus } = await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+        if (existingStatus !== 'granted') {
+          const { status } = await Notifications.requestPermissionsAsync();
+          finalStatus = status;}
+        if (finalStatus !== 'granted') {
+          alert('Failed to get push token for push notification!');
+          return;
+        }         
+        token = (await Notifications.getExpoPushTokenAsync()).data;
+       return token;
+      }
+    }
+
+    const removeNotificationSubscription = (subs) => {
+     Notifications.removeNotificationSubscription(subs);
+    }
+   
+    useEffect(() => {
+      registerForPushNotificationsAsync().then(token => {
+       console.log(token)
+       setExpoPushToken(token)
+       //registerDevice(authenticated?.token , token);
+      }
+       )
+       const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+        
+        let data = response.notification.request.content.data;
+        console.log(data)
+        if (data?.notification_type){
+          console.log(navigationRef)
+          navigationRef?.navigate('EventDetail', data.event_id);  
+        }
+        
+
+      });
+      notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+        //console.log(notification.request.content.data);
+        setNotification(notification);
+      })
+      
+      return () => {
+        removeNotificationSubscription(notificationListener.current);
+      };
+    }, [])
+
+    const navigateToScreen = (screenName) => {
+      navigationRef.navigate(screenName);
+    };
 
   return (
+    <NotificationContext.Provider value={notification}>
+     <TokenContext.Provider value={expoPushToken}>
     <LoginContext.Provider value={{ authenticated, setAuthenticated }}>
       <NativeBaseProvider>
           
-          <NavigationContainer >
+          <NavigationContainer ref={setNavigationRef} >
             {authenticated ? 
                         <MainStack.Navigator >
                         <MainStack.Screen 
@@ -119,11 +184,15 @@ export default function App() {
               </notAuthenticatedNavigator.Navigator>
               
             }
+            
             <StatusBar style="light" />
           </NavigationContainer>
           </NativeBaseProvider>
       
     </LoginContext.Provider>
-        
+          </TokenContext.Provider>
+          </NotificationContext.Provider>
   );
 }
+
+

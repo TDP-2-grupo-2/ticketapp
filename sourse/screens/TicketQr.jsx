@@ -24,11 +24,12 @@ export const TicketQr = ({route}) => {
           <LinearGradient 
         colors={[Colors.BLACK, Colors.BACKGROUND_TICKETS]} 
         style={{position:'absolute',bottom:0,height : '30%', width : '100%'}}/>
-            <TouchableOpacity  onPress={() => {navigator.goBack()}} style={{ marginLeft:20,paddingHorizontal:10,
-                   paddingVertical:5, backgroundColor:Colors.SOMBREADO,
-                    borderRadius:15,}}>
-      <Ionicons  name="arrow-back-sharp" color={Colors.WHITE} size={30}></Ionicons>
-    </TouchableOpacity>
+
+        <TouchableOpacity  onPress={() => {navigator.goBack()}} style={{ marginLeft:20,paddingHorizontal:10, width:'15%',
+                paddingVertical:5, backgroundColor:Colors.SOMBREADO,
+                borderRadius:15,}}>
+                <Ionicons  name="arrow-back-sharp" color={Colors.WHITE} size={30}></Ionicons>
+        </TouchableOpacity>
     
     <View style={{marginHorizontal: 18, marginBottom:'10%'}}>
     <View style={{position:'absolute',
@@ -55,7 +56,7 @@ export const TicketQr = ({route}) => {
         </View>
         <View style={{flexDirection:'row', justifyContent:'space-around', alignContent:'center', alignItems:'center'}}>
         <SmallCalendar day={params.day} month={params.month}  ></SmallCalendar>
-        <Text style={{color:Colors.WHITE, fontSize:30, marginLeft:10}}>Estado: Valido</Text>
+        <Text style={{color:Colors.WHITE, fontSize:30, marginLeft:10}}>Estado: {params.status}</Text>
 
         </View>
         <Text style={{color:Colors.WHITE, fontSize:15,marginTop:10, marginLeft:10}}>Desde: {params.start} hasta: {params.end}</Text>

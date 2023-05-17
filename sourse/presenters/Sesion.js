@@ -1,6 +1,7 @@
 import { async } from "@firebase/util";
 import axios from "axios";
 import ApiKeys from "../constants/ApiKeys";
+import { LoginContext } from '../context/LoginContext';
 
 import {
     GoogleSignin,
@@ -8,7 +9,7 @@ import {
     statusCodes,
   } from '@react-native-google-signin/google-signin';
 import AppConstants from "../constants/AppConstants";
-import ApiKeys from "../constants/ApiKeys";
+
 
   
   
@@ -75,3 +76,27 @@ export async function  signIn(setCredentials) {
       }
     }
   };
+
+
+  export async function registerDevice( authToken, device){
+
+    console.log("persona" + authToken)
+
+    console.log("Dispositivo" +device)
+    if(authToken){
+      const jsonResponse = await axios.post(
+        `${AppConstants.API_NOTIF_URL}/notifications/new_user`,
+        {
+          device_token:device,
+        },{
+          headers: {'Authorization': `Bearer ${authToken}`}
+        }
+    ).catch(function (error) {
+      
+      console.log(error.response)
+  
+    })
+    }
+
+
+  }

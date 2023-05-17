@@ -1,11 +1,11 @@
 import React, {useEffect} from 'react'
-import { Modal, Text, TouchableOpacity, View } from 'react-native'
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Colors from '../constants/Colors'
 
 
 const bottonStyle ={
     borderRadius:10,
-    backgroundColor:Colors.PURPLE_BUTTOM,
+    
     padding:10,
     paddingHorizontal:20,
     margin:5,
@@ -14,38 +14,36 @@ const bottonStyle ={
 
 const ModalStyle = {width:'80%',
                     
-                     backgroundColor:Colors.PURPLE,
-                    //flex:1,
+                     backgroundColor:Colors.PURPLE,       
                     marginTop:'50%',
                     margin:'10%',
                     borderRadius:20,
-                    //justifyContent:'center',
-                    // height:'80%', 
-                    
                     };
 
 
-export const ModalAccept = ({toggle, setToggle}) => {
+export const ModalAccept = ({toggle, setToggle,type, header, bodyText}) => {
 
     
   return (
     <Modal visible={toggle} transparent={true} animationType={'fade'} >
-                <View style={ModalStyle}>
-                    <View style={{borderTopStartRadius:20,paddingVertical:20, borderTopEndRadius:20, backgroundColor:Colors.PURPLE_LIGTH }}>
+                <View style={[ModalStyle,
+                                type == 'success' ? successStyle.body: (type == 'error'?cancelStyle.body: defaultStyle.body)
+                ]}>
+                    <View style={[{borderTopStartRadius:20,paddingVertical:20, borderTopEndRadius:20 },
+                                type == 'success' ? successStyle.header: (type == 'error'?cancelStyle.header: defaultStyle.header)
+                    ]}>
                         <Text style={{color:Colors.WHITE , 
-                            
                             fontSize:28,
-                            
-                            textAlign:'center',
-                            }}>¡Genial!</Text>
+                            textAlign:'center',                            
+                            }}>{header}</Text>
                     </View>
-                    <Text style={{fontSize:18, color:Colors.WHITE, margin:10, alignSelf:'center'}}>Tu entrada ha sido reservada</Text>
-                    <Text>{toggle?'true':'falses'}</Text>
+                    <Text style={{fontSize:18, color:Colors.WHITE, margin:10, textAlign:'center',marginVertical:25  }}>{bodyText}</Text>
+                    
                     <View style={{flexDirection:'row', justifyContent:'center',marginBottom:10}}>
                         <TouchableOpacity 
                             onPress={() => {setToggle(false)}} 
-                            style={bottonStyle}>
-                            <Text style={{color:Colors.WHITE}}>Aplicar</Text>
+                            style={[bottonStyle, type == 'success' ? successStyle.buttom: (type == 'error'?cancelStyle.buttom: defaultStyle.buttom)]}>
+                            <Text style={{color:Colors.WHITE}}>Aceptar</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -53,3 +51,39 @@ export const ModalAccept = ({toggle, setToggle}) => {
             </Modal>
   )
 }
+
+const defaultStyle = StyleSheet.create({
+    header: {
+        backgroundColor:Colors.PURPLE_LIGTH
+    },
+    body: {
+        backgroundColor:Colors.PURPLE,
+    },
+    buttom: {
+        backgroundColor:Colors.PURPLE_BUTTOM,
+    }
+  });
+
+  const successStyle = StyleSheet.create({
+    header: {
+        backgroundColor:Colors.GREEN_LIGTH
+    },
+    body: {
+        backgroundColor:Colors.GREEN,
+    },
+    buttom: {
+        backgroundColor:Colors.GREEN_BUTTOM,
+    }
+  });
+
+  const cancelStyle = StyleSheet.create({
+    header: {
+        backgroundColor:Colors.RED
+    },
+    body: {
+        backgroundColor:Colors.RED_LIGTH,
+    },
+    buttom: {
+        backgroundColor:Colors.RED_BUTTOM,
+    }
+  });

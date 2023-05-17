@@ -21,6 +21,7 @@ import { LoginContext } from '../context/LoginContext';
 import { AgendaItem } from '../components/AgendaItem';
 
 import MapboxGL from '@rnmapbox/maps';
+import { ReportsModal } from '../components/ReportsModal';
 
 MapboxGL.setAccessToken('pk.eyJ1IjoicmFtaXJvLXNhbmNoZXoiLCJhIjoiY2xndjlkc3YzMG80NTNwa2xsc3FudGloaSJ9.Fr6JzzPfoSbp-UnxuEr_HA');
 
@@ -118,6 +119,10 @@ export const EventDetail = ({route}) => {
     const verTicket = () => {
       navigator.navigate('VerQR', {...ticket, eventName: event.eventName,start:event.start ,end:event.end,day:event.day,month:event.month })
     }
+    
+    const denunciarEvento = () => {
+      console.log('asdsad');
+    }
 
   return (
     <View>
@@ -134,19 +139,29 @@ export const EventDetail = ({route}) => {
    
 </ImageBackground>
     
-    
+    <View style={{position:'absolute',top:110 ,right:20   }}>
+      {event.eventId ?
+      <ReportsModal eventId={event.eventId}></ReportsModal>
+      :
+      <></>
+      }
+      
+    {/* <TouchableOpacity onPress={denunciarEvento} style={{ marginLeft:'80%',paddingHorizontal:10,
+                    paddingVertical:5, backgroundColor:Colors.SOMBREADO,
+                    borderRadius:15,
+                    }}> 
+          <Feather  name="flag" size={30} color={Colors.WHITE} />
+        </TouchableOpacity> */}
+    </View>
     <View style={{top: 200 ,position:'absolute', marginLeft:'5%',width:'90%'}}>
+
         <View style={{flexDirection:'row', justifyContent:'space-between'}}>
         <View>
         <Text  style={{color:Colors.TEXT_SEC, fontSize:13}}>{event.eventType}</Text>
-          <Text  style={{color:Colors.WHITE, fontSize:30}}>{event.eventName}</Text>
+          <Text  style={{color:Colors.WHITE, fontSize:26}}>{event.eventName}</Text>
           <Text  style={{color:Colors.TEXT_SEC, fontSize:13}}>Desde: {event.start} hasta: {event.end}</Text>
         </View>
-        <TouchableOpacity style={{ marginLeft:20,paddingHorizontal:10,
-                    paddingVertical:5, backgroundColor:Colors.SOMBREADO,
-                    borderRadius:15,}}> 
-          <Feather  name="flag" size={30} />
-        </TouchableOpacity>
+
         <SmallCalendar day={event.day} month={event.month}  ></SmallCalendar>
         </View>
     </View>
@@ -210,9 +225,7 @@ export const EventDetail = ({route}) => {
    <Text style={[TitleStyle,{color:Colors.WHITE, fontSize:20, marginTop:20,marginBottom:10}]}>Preguntas Frecuentes</Text>
    <View style={{marginBottom:'40%'}} >
     {event.faqs ? 
-      //  <Text>{JSON.stringify(Object.keys(event.faqs) )}</Text>
       event.faqs.map((pregunta) =>  <FrequentQuestion key={pregunta.pregunta} question={pregunta.pregunta} answer={pregunta.respuesta}></FrequentQuestion>)
-      //<Text>{JSON.stringify(event.faqs)}</Text>
       :
       <></>
       }
@@ -244,7 +257,7 @@ export const EventDetail = ({route}) => {
     </View>
     
     </View>
-    <ModalAccept toggle={toggle} setToggle = {setToggle}></ModalAccept>
+    <ModalAccept toggle={toggle} header='¡Genial!' bodyText='Acabas de reservar tu entrada' setToggle = {setToggle}></ModalAccept>
     
     {event.capacity? 
     <View style={[NavbarStyle,{}]}>

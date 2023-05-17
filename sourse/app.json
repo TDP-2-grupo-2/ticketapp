@@ -21,6 +21,7 @@
       "bundleIdentifier": "com.TicketApp.appMobile"
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "package": "com.TicketApp.appMobile",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
@@ -41,6 +42,13 @@
         {
           "RNMapboxMapsImpl": "mapbox",
           "RNMapboxMapsDownloadToken": "sk.eyJ1IjoicmFtaXJvLXNhbmNoZXoiLCJhIjoiY2xndmF2YXM5MDBheTNrbXZiMTRiaThyOSJ9.15lE2tLkzZuuLvSobTxvOA"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon_noti.png",
+          "color": "#ffffff"
         }
       ]
     ]

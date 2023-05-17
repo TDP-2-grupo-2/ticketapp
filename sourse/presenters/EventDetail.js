@@ -2,6 +2,7 @@ import AppConstants from "../constants/AppConstants";
 import { getFirebaseImage } from '../utils/FirebaseHandler';
 import axios from "axios";
 import { ConstructionOutlined } from "@mui/icons-material";
+import { async } from "@firebase/util";
 
 
 export async function getEvent(setEvents,eventId ){
@@ -92,8 +93,35 @@ export async function getTicket(userId, eventId, setTicket){
     )
     .then(function (jsonResponse) {
         //console.log(jsonResponse.data.message._id.$oid);
-
-        setTicket({ticketId: jsonResponse.data.message._id.$oid});
+        let status = jsonResponse.data.message.status;
+        switch (status) {
+            case 'to_be_used':
+                status = "Disponible"
+              break;
+            case 'suspended':
+                status = "Suspendido"
+              break;
+            case 'canceled':
+                status = "Cancelado"
+              break;
+            case 'used':
+                status = "Utilizada"
+              break;
+            case 'blocked':
+                status = "Blockeado"
+              break;
+            case 'blocked':
+                status = "Blockeado"
+              break;
+          }
+        //console.log(jsonResponse.data.message)
+        setTicket({ticketId: jsonResponse.data.message._id.$oid,
+            eventDate:jsonResponse.data.message.event_date, 
+            event_id:jsonResponse.data.message.event_id, 
+            event_name:jsonResponse.data.message.event_name, 
+            event_start_time:jsonResponse.data.message.event_start_time, 
+            status:status
+        });
       })
       .catch(function (error) {
         console.log('error')
@@ -125,4 +153,31 @@ export async function pachIsFavorite(userId, eventId, setFavorite){
             setFavorite(jsonResponse.data.message == "Se agregó como favorito el evento") ;
         }
     }
+}
+
+export async function reportEvent(authToken,reportData, setSucces, setError ,setErrorMessagge){
+        console.log(reportData.eventId)
+        console.log(reportData.reportType)
+       // authToken
+        console.log(authToken)
+        const jsonResponse = await axios.post(
+          `${AppConstants.API_URL}/attendees/report/event`,
+          {
+            event_id:reportData?.eventId,
+            reason:reportData?.reportType,
+          },{
+            headers: {'Authorization': `Bearer ${authToken}`}
+          }
+      ).then(function (response) {
+        // handle success
+        setSucces(true)
+      })
+      .catch(function (error) {
+        
+        setError(true);
+        console.log(error.response.data)
+        setErrorMessagge(error.response.data.detail);
+    
+      })
+      
 }

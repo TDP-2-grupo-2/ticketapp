@@ -1,0 +1,77 @@
+{
+  "project_info": {
+    "project_number": "584299102101",
+    "firebase_url": "https://tdp2-ticketapp-default-rtdb.firebaseio.com",
+    "project_id": "tdp2-ticketapp",
+    "storage_bucket": "tdp2-ticketapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:584299102101:android:eaf1800ac69bf2180dc09c",
+        "android_client_info": {
+          "package_name": "com.TicketApp.appMobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "584299102101-mq6jr76qubau89osmtiacv8s3jts3a4t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKknShlar-8DfCp07g-4ySMVYYdAyNsRQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "584299102101-mq6jr76qubau89osmtiacv8s3jts3a4t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:584299102101:android:fde0ba33b24d340e0dc09c",
+        "android_client_info": {
+          "package_name": "com.ticketapp.notifications"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "584299102101-kqndqe0n0dni11jk5n3c46e0d9798puh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ticketapp.notifications",
+            "certificate_hash": "98437fe6456a92090b45f17672aa3f602742757e"
+          }
+        },
+        {
+          "client_id": "584299102101-mq6jr76qubau89osmtiacv8s3jts3a4t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKknShlar-8DfCp07g-4ySMVYYdAyNsRQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "584299102101-mq6jr76qubau89osmtiacv8s3jts3a4t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

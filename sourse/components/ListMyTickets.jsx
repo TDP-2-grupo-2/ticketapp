@@ -22,7 +22,7 @@ export const ListMyTickets = ({idPersona}) => {
     setRefreshing(false);
 }
     return (
-      <ScrollView style={{marginBottom:'40%',}}
+      <ScrollView style={{marginBottom:'10%',}}
       refreshControl={
         <RefreshControl refreshing={refreshing} 
             onRefresh={onRefresh} />

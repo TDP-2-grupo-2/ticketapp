@@ -6,18 +6,24 @@ import { AntDesign } from '@expo/vector-icons';
 import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { LoginContext } from '../context/LoginContext';
 import Colors from '../constants/Colors';
-import { signIn } from '../presenters/Sesion';
+import { registerDevice, registerDivace, signIn } from '../presenters/Sesion';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Fontisto } from '@expo/vector-icons';
+import { TokenContext } from '../context/TokenContext';
+import { TokenError } from 'expo-auth-session';
 
 export const LogginScreen = () => {
     const { setAuthenticated } = useContext(LoginContext);
+    const tokenDevice = useContext(TokenContext);
 
     const onPressButton = async ()=> {
       let credentials = await signIn();
       //console.log(credentials);
       setAuthenticated(credentials);
+      
+      registerDevice(credentials.token, tokenDevice)
+
     }
   return (
     <View style={{ backgroundColor: Colors.WHITE, height:'100%', alignItems:'center'}}>
