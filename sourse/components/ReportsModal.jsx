@@ -83,7 +83,7 @@ export const ReportsModal = ({eventId}) => {
       };
 
     const onSubmit =() =>{
-        console.log(filtros);
+        //console.log(filtros);
         if(!filtros.reportType){
             settoggleAvvertencia(true)
         }else{

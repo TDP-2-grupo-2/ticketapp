@@ -50,6 +50,12 @@
           "icon": "./assets/icon_noti.png",
           "color": "#ffffff"
         }
+      ],
+      [
+        "expo-calendar",
+        {
+          "calendarPermission": "TicketApp necesita acceso para acceder a tu Calendario."
+        }
       ]
     ]
   }

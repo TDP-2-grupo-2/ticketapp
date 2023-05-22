@@ -30,7 +30,7 @@ export const Home = (navigation) => {
             'cordinates': '-34.499667,-58.494262',
             'range':range
         });
-        //console.log(filtros)
+
     }
 
   return (

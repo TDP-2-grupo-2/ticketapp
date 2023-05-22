@@ -7,6 +7,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LoginContext } from '../context/LoginContext';
 import { getEvents } from '../presenters/MyTickets';
 import { RefreshControl } from 'react-native';
+import { MyTicketCard } from './MyTicketCard';
 export const ListMyTickets = ({idPersona}) => {
     const [eventos, setEventos] = useState([])
     const { authenticated } = useContext(LoginContext);
@@ -29,7 +30,7 @@ export const ListMyTickets = ({idPersona}) => {
       }
       >
       {eventos.length>=1 ?
-      eventos.map(evento => <SearchCard key={evento.eventId} event = {evento}> </SearchCard>)
+      eventos.map(evento => <MyTicketCard key={evento.eventId} event = {evento}> </MyTicketCard>)
       :
       <View style={{justifyContent:'center', alignItems:'center', marginTop:'20%'}}>
         <Fontisto name="ticket" size={150} color={Colors.TABBAR_INACTTIVE} style={{marginVertical:'20%'}}/>

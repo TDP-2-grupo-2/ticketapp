@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, useState,useRef } from 'react'
 
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { NavigationContainer, useNavigation, useNavigationContainerRef } from '@react-navigation/native';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Entypo from '@expo/vector-icons/Entypo';
@@ -25,6 +25,8 @@ import * as Notifications from 'expo-notifications';
 import { NotificationContext } from './context/NotificationContext';
 import { TokenContext } from './context/TokenContext';
 import { registerDevice } from './presenters/Sesion';
+import { EventPreview } from './screens/EventPreview';
+import { LinkInvalidEventsScreen } from './screens/LinkInvalidEventsScreen';
 
 
 
@@ -98,7 +100,10 @@ export default function App() {
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
   //const navigation = useNavigation();
-  const [navigationRef, setNavigationRef] = useState(null)
+  //const [navigationRef, setNavigationRef] = useState(null);
+  const navigationRef = useNavigationContainerRef();
+  const [data, setData] = useState(null);
+  const [newNotification, setnewNotification] = useState(false)
 
 
   const registerForPushNotificationsAsync = async () => {
@@ -137,18 +142,13 @@ export default function App() {
       }
        )
        const subscription = Notifications.addNotificationResponseReceivedListener(response => {
-        
-        let data = response.notification.request.content.data;
-        console.log(data)
-        if (data?.notification_type){
-          console.log(navigationRef)
-          navigationRef?.navigate('EventDetail', data.event_id);  
-        }
-        
+        setData(response.notification.request.content.data);
+        setnewNotification(true);
+        redireccionarPantalla(response.notification.request.content.data);
+        return () => subscription.remove();
 
       });
       notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-        //console.log(notification.request.content.data);
         setNotification(notification);
       })
       
@@ -157,25 +157,41 @@ export default function App() {
       };
     }, [])
 
-    const navigateToScreen = (screenName) => {
-      navigationRef.navigate(screenName);
-    };
+    const redireccionarPantalla = (data) => {
+      if (data?.notification_type == 'reminder'){
+        navigationRef.navigate('EventDetail', data.event_id);  
+      }
+      if (data?.notification_type == 'modifications'){
+        if(data.modifications.status== 'canceled' || data.modifications.status== 'suspended')
+        navigationRef.navigate('LinkInvalidEventsScreen', data);  
+      }else{
+        navigationRef.navigate('EventPreview', data);  
+      }
+    }
 
+    const notificationHandlerRama = ()=>{
+      if(newNotification){
+        setnewNotification(false)
+        redireccionarPantalla(data)
+      }
+      
+    } ;
   return (
     <NotificationContext.Provider value={notification}>
      <TokenContext.Provider value={expoPushToken}>
     <LoginContext.Provider value={{ authenticated, setAuthenticated }}>
       <NativeBaseProvider>
           
-          <NavigationContainer ref={setNavigationRef} >
+          <NavigationContainer ref={navigationRef} onReady={notificationHandlerRama} >
             {authenticated ? 
                         <MainStack.Navigator >
                         <MainStack.Screen 
                           name="AuthStack" component={AuthenticatedBottomTab} options={{ headerShown: false }}
                         />
                       <MainStack.Screen name="EventDetail" component={EventDetail} options={{ headerShown: false}}/>
+                      <MainStack.Screen name="EventPreview" component={EventPreview} options={{ headerShown: false}}/>
                       <MainStack.Screen name="VerQR" component={TicketQr} options={{ headerShown: false}}/>
-
+                      <MainStack.Screen name="LinkInvalidEventsScreen" component={LinkInvalidEventsScreen} options={{ headerShown: false}}/>
                     </MainStack.Navigator>
             :
               <notAuthenticatedNavigator.Navigator screenOptions={{ headerShown: false }}>

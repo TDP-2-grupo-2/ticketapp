@@ -18,17 +18,12 @@ export async function getEvent(setEvents,eventId ){
                     try{
                         imageURI = await getFirebaseImage("files/"+jsonResponse.data.message.photos[0]);
                     }catch(exception){
-                        console.log(exception)
                         //Image not available
                         imageURI = "https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-1-scaled.png";
                     }
                 let tags = [];
                 if (jsonResponse.data.message.tags){
                     
-                    // for(let j=0; j<jsonResponse.data.message.tags.length; j++){
-                    //     console.log(jsonResponse.data.message.tags[j])
-                    //     tags.push(jsonResponse.data.message.tags[j]);
-                    // }
                 }
                 let startTime = jsonResponse.data.message.start.split(':');
                 startTime = startTime[0]+ ':'+ startTime[1];
@@ -78,7 +73,6 @@ export async function reserveTicket(userId, eventId,setTicket ){
         setTicket({ticketId: jsonResponse.data.message._id.$oid});
       })
       .catch(function (error) {
-        console.log('error')
         // handle error
             setTicket({})
       })
@@ -86,13 +80,10 @@ export async function reserveTicket(userId, eventId,setTicket ){
 }
 
 export async function getTicket(userId, eventId, setTicket){
-    console.log("consulto");
-
     const jsonResponse = await axios.get(
         `${AppConstants.API_URL}/events/reservations/user/${userId}/event/${eventId}`,//cambiar x el optener
     )
     .then(function (jsonResponse) {
-        //console.log(jsonResponse.data.message._id.$oid);
         let status = jsonResponse.data.message.status;
         switch (status) {
             case 'to_be_used':
@@ -114,7 +105,6 @@ export async function getTicket(userId, eventId, setTicket){
                 status = "Blockeado"
               break;
           }
-        //console.log(jsonResponse.data.message)
         setTicket({ticketId: jsonResponse.data.message._id.$oid,
             eventDate:jsonResponse.data.message.event_date, 
             event_id:jsonResponse.data.message.event_id, 
@@ -124,8 +114,6 @@ export async function getTicket(userId, eventId, setTicket){
         });
       })
       .catch(function (error) {
-        console.log('error')
-        // handle error
             setTicket({})
       })
       ;
@@ -156,10 +144,7 @@ export async function pachIsFavorite(userId, eventId, setFavorite){
 }
 
 export async function reportEvent(authToken,reportData, setSucces, setError ,setErrorMessagge){
-        console.log(reportData.eventId)
-        console.log(reportData.reportType)
-       // authToken
-        console.log(authToken)
+
         const jsonResponse = await axios.post(
           `${AppConstants.API_URL}/attendees/report/event`,
           {
@@ -175,7 +160,7 @@ export async function reportEvent(authToken,reportData, setSucces, setError ,set
       .catch(function (error) {
         
         setError(true);
-        console.log(error.response.data)
+   
         setErrorMessagge(error.response.data.detail);
     
       })
