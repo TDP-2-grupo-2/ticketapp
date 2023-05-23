@@ -33,11 +33,11 @@ export async function getEvent(setEvents,eventId ){
                 let date = jsonResponse.data.message.dateEvent.split('-');
                 let day = parseInt(date[2]) ;
                 let month = parseInt(date[1]);
-
+                
                 setEvents({
                     eventId: jsonResponse.data.message._id.$oid,
                     eventName: jsonResponse.data.message.name,
-                    owner: jsonResponse.data.message.owner,
+                    owner: jsonResponse.data.message.ownerName,
                     description: jsonResponse.data.message.description,
                     locationDescription: jsonResponse.data.message.locationDescription,
                     

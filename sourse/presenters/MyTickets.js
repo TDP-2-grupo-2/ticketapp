@@ -30,7 +30,9 @@ export async function getEvents(userId, setEvents ){
                 let date = jsonResponse.data.message[i].dateEvent.split('-');
                 let day = parseInt(date[2]) ;
                 let month = parseInt(date[1]);
+
                 Events.push({
+                    status:jsonResponse.data.message[i].status,
                     eventId: jsonResponse.data.message[i]._id.$oid,
                     eventName: name,
                     dateEvent: jsonResponse.data.message[i].dateEvent,
@@ -39,7 +41,9 @@ export async function getEvents(userId, setEvents ){
                     image: imageURI,
                     eventType: jsonResponse.data.message[i].eventType,
                     day: day,
-                    month: month
+                    month: month,
+                    start: jsonResponse.data.message[i].start,
+                    end: jsonResponse.data.message[i].end,
                 });
             }
         }

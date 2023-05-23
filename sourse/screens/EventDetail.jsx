@@ -204,7 +204,6 @@ export const EventDetail = ({route}) => {
     <Text style={[TitleStyle]}>Organizador</Text>
   <View style={[SeccionStyle,{flexDirection:'row', alignItems:"center"}]}>
   <Ionicons  name='person'  style={{marginHorizontal:5}} color={Colors.WHITE} size={20}></Ionicons>
-
  
     <Text style={{color:Colors.WHITE, fontSize:16, margin:10}}>{event.owner}</Text>
     </View>

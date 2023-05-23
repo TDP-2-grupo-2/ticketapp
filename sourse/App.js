@@ -162,7 +162,7 @@ export default function App() {
         navigationRef.navigate('EventDetail', data.event_id);  
       }
       if (data?.notification_type == 'modifications'){
-        if(data.modifications.status== 'canceled' || data.modifications.status== 'suspended')
+        if(data.modifications.status== 'cancelled' || data.modifications.status== 'suspended')
         navigationRef.navigate('LinkInvalidEventsScreen', data);  
       }else{
         navigationRef.navigate('EventPreview', data);  

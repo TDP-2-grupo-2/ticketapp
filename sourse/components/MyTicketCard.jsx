@@ -1,28 +1,55 @@
-import React, { useEffect } from 'react';
+import React, { useEffect,useState } from 'react';
 
 import * as Calendar from 'expo-calendar';
+
 
 import { Text, TouchableOpacity, View,Platform } from 'react-native'
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { SearchCard } from './SearchCard'
 import Colors from '../constants/Colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { ModalAccept } from './ModalAccept';
 
 export const MyTicketCard = ({event}) => {
+  const [granted, setGranted] = useState(false)
+const [eventIdInCalendar, setEventIdInCalendar] = useState("") 
+const [toggle, setToggle] = useState(false)
 
-    useEffect(() => {
-        (async () => {
-          const { status } = await Calendar.requestCalendarPermissionsAsync();
-          if (status === 'granted') {
-            const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
-            console.log('Here are all your calendars:');
-            console.log({ calendars });
-          }
-        })();
-      }, []);
+  const openCalenarRequest = async () => {
+    const {status} = await Calendar.requestCalendarPermissionsAsync();
+    if (status === "granted") {
+       setGranted(true)
+    }
+}
+const eventDetails = {
+  title:'Event Title', 
+  startDate: new Date('2019-12-14 07:00'),
+  endDate: new Date('2019-12-14 15:00'),
+  };
+useEffect(()=>{
+  openCalenarRequest() // Ask for Premission to access phone calendar
+},[])
+const addEventToCalendar = async () => {
+  console.log(event)
+  if(event?.status == 'active'){
+    let calendarEvent = {
+      title: event.eventName, 
+      startDate:new Date(event.dateEvent + ' ' + event.start) ,
+      endDate: new Date(event.dateEvent + ' ' + event.end),
+      };
+    console.log(calendarEvent);
+    const eventIdInCalendar = await Calendar.createEventAsync("1",calendarEvent)
+    Calendar.openEventInCalendar(eventIdInCalendar)// that will give the user the ability to access the event in phone calendar 
+    setEventIdInCalendar(eventIdInCalendar)
+    
+  }else{
+    setToggle(true);
+  }
+
+ }
   return (<View>
       <SearchCard event = {event}> </SearchCard>
-  <TouchableOpacity onPress={createCalendar}   style={{ paddingHorizontal:10, display:'flex',
+  <TouchableOpacity onPress={addEventToCalendar}   style={{ paddingHorizontal:10, display:'flex',
                     backgroundColor:Colors.SOMBREADO,
                     borderRadius:25, width:50,
                     height: 40, width: 40, alignItems: 'center', alignContent: 'center', justifyContent: 'center', left: '80%', bottom: '15%', position: 'absolute'}}>
@@ -30,29 +57,12 @@ export const MyTicketCard = ({event}) => {
       
       
     </TouchableOpacity>
+    <ModalAccept toggle={toggle} header='Cuidado!' bodyText={'No podes guardar un evento que no esta activo'} setToggle = {setToggle} type="error"></ModalAccept>
+
 
   </View>
   )
-  async function getDefaultCalendarSource() {
-    const defaultCalendar = await Calendar.getDefaultCalendarAsync();
-    return defaultCalendar.source;
-  }
-  
-  async function createCalendar() {
-    const defaultCalendarSource =
-      Platform.OS === 'ios'
-        ? await getDefaultCalendarSource()
-        : { isLocalAccount: true, name: 'Expo Calendar' };
-    const newCalendarID = await Calendar.createCalendarAsync({
-      title: 'Expo Calendar',
-      color: 'blue',
-      entityType: Calendar.EntityTypes.EVENT,
-      sourceId: defaultCalendarSource.id,
-      source: defaultCalendarSource,
-      name: 'internalCalendarName',
-      ownerAccount: 'personal',
-      accessLevel: Calendar.CalendarAccessLevel.OWNER,
-    });
-    console.log(`Your new calendar ID is: ${newCalendarID}`);
-  }
+
+
+
 }
