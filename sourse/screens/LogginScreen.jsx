@@ -6,18 +6,30 @@ import { AntDesign } from '@expo/vector-icons';
 import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { LoginContext } from '../context/LoginContext';
 import Colors from '../constants/Colors';
-import { signIn } from '../presenters/Sesion';
+import { registerDevice, registerDivace, signIn } from '../presenters/Sesion';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Fontisto } from '@expo/vector-icons';
+import { TokenContext } from '../context/TokenContext';
+
+import { ModalAccept } from '../components/ModalAccept';
 
 export const LogginScreen = () => {
     const { setAuthenticated } = useContext(LoginContext);
+    const tokenDevice = useContext(TokenContext);
+    const [toggle, setToggle] = useState(false);
 
     const onPressButton = async ()=> {
       let credentials = await signIn();
       //console.log(credentials);
       setAuthenticated(credentials);
+      if(credentials){
+        registerDevice(credentials.token, tokenDevice)
+      }else{
+        setToggle(true);
+      }
+      
+
     }
   return (
     <View style={{ backgroundColor: Colors.WHITE, height:'100%', alignItems:'center'}}>
@@ -28,6 +40,8 @@ export const LogginScreen = () => {
     <Fontisto name="ticket" size={72} color="black" />
       
     </View>
+    <ModalAccept toggle={toggle} header='Error' bodyText={'Nos e pudo ingresar con Google, prueba mas tarde'} setToggle = {setToggle} type="error"></ModalAccept>
+
     <Text style={{color:Colors.WHITE, fontSize:33, marginTop:'10%'}}>TiketApp</Text>
     <Text style={{color:Colors.WHITE, fontSize:33, marginTop:'10%',fontWeight:'bold'}}>¡Que bueno verte!</Text>
     <MaterialCommunityIcons name="hand-wave-outline" size={150} color="black" style={{marginVertical:'10%'}} />

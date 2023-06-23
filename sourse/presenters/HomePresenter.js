@@ -22,7 +22,6 @@ export async function getEventsByCategories(setEvents,name, eventType,taglist,co
     if(range){
         params.distances_range = range;
     }
-    console.log(params)
     
     const jsonResponse = await axios.get(
         `${AppConstants.API_URL}/events/`,
@@ -34,11 +33,9 @@ export async function getEventsByCategories(setEvents,name, eventType,taglist,co
     const Events = [];
     if (jsonResponse.status === 200){
         if(!jsonResponse.status_code){
-            //console.log(jsonResponse.data.message.length)
             for(let i=0; i<jsonResponse.data.message.length; i++){
                 let imageURI;
                 
-                //console.log(jsonResponse.data.message[i].photos ? jsonResponse.data.message[i].photos[0]: null)
                     try{
                         imageURI = await getFirebaseImage("files/"+jsonResponse.data.message[i].photos[0]);
                     }catch(exception){
@@ -47,11 +44,7 @@ export async function getEventsByCategories(setEvents,name, eventType,taglist,co
                     }
                 let tags = [];
                 if (jsonResponse.data.message[i].tags){
-                    
-                    // for(let j=0; j<jsonResponse.data.message[i].tags.length; j++){
-                    //     console.log(jsonResponse.data.message[i].tags[j])
-                    //     tags.push(jsonResponse.data.message[i].tags[j]);
-                    // }
+
                 }
                 let name = jsonResponse.data.message[i].name
                 if (name.length > 20){
@@ -87,4 +80,40 @@ export async function getFireBaseImageWithSetImage(image_path, setImage){
         imageURI = "https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-1-scaled.png";
     }
     setImage(imageURI)
+}
+
+
+
+export async function getShareEvent(setEvents,eventId ){
+    console.log(eventId);
+
+    const jsonResponse = await axios.get(
+        `${AppConstants.API_URL}/events/${eventId}`,
+    ).then(function (response) {
+        setEvents({
+            notification_type:'shared',
+            event_id: response.data.message._id.$oid,
+            eventName: response.data.message.name,
+            modifications: {
+                status: response.data.message.status
+            },
+            notFound: false
+            });
+      })
+    .catch(function (error) {
+      
+        setEvents({
+            notification_type:'shared',
+            event_id: null,
+            eventName: null,
+            modifications: {
+                status: null
+            },    
+            status: null,
+            notFound: true
+        })
+        
+      })
+
+    
 }

@@ -1,6 +1,6 @@
-import React, { useEffect, useContext, useState } from 'react'
+import React, { useEffect, useContext, useState,useRef } from 'react'
 
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation, useNavigationContainerRef } from '@react-navigation/native';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Entypo from '@expo/vector-icons/Entypo';
@@ -20,6 +20,17 @@ import { NativeBaseProvider, Text, Box } from "native-base";
 import { isLoggedIn, LoginContext } from './context/LoginContext';
 import { LogginScreen } from './screens/LogginScreen';
 import { TicketQr } from './screens/TicketQr';
+
+import * as Notifications from 'expo-notifications';
+import { NotificationContext } from './context/NotificationContext';
+import { TokenContext } from './context/TokenContext';
+import { registerDevice } from './presenters/Sesion';
+import { EventPreview } from './screens/EventPreview';
+import { LinkInvalidEventsScreen } from './screens/LinkInvalidEventsScreen';
+import * as Linking from 'expo-linking';
+
+import { getEvent, getShareEvent } from './presenters/HomePresenter';
+
 
 
 function EventsStack() {
@@ -88,42 +99,188 @@ const notAuthenticatedNavigator = createNativeStackNavigator();
 export default function App() {
   const islogged = useContext(LoginContext);
   const [authenticated, setAuthenticated] = useState(null);
-  useEffect(() => {
-    // Session.getInstance().load()
-    // .then(session => {
-    //   setAppAuthContext({
-    //     userSession: session,
-    //     favorites: []
-    //   })
-    // })
-  }, []);
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  //const navigation = useNavigation();
+  //const [navigationRef, setNavigationRef] = useState(null);
+  const navigationRef = useNavigationContainerRef();
+  const [data, setData] = useState(null);
+  const [newNotification, setnewNotification] = useState(false);
+  const [shareEvent, setShareEvent] = useState(null);
+  const [eventAfterLogin, setEventAfterLogin] = useState(null)
+  const [url, setUrl] = useState(null)
 
+  
+  // if (url) {
+  //   const { hostname, path, queryParams } = Linking.parse(url);
+
+  //   console.log(
+  //     `Linked to app with hostname: ${hostname}, path: ${path} and data: ${JSON.stringify(
+  //       queryParams
+  //     )}`
+  //   );
+  //   getShareEvent(setShareEvent,queryParams.event_id);
+    
+  // }
+  // const redirectEvent = async () =>{
+    
+  // }
+  useEffect(() => {
+    if(url){
+      const { queryParams } = Linking.parse(url);
+      getShareEvent(setShareEvent,queryParams.event_id);
+    }
+  
+  }, [url])
+  
+  const handleDeepLink = async (url) => {
+    setUrl(url)
+  };
+  useEffect(() => {
+
+
+
+    // Agregar el listener para detectar deep links
+    Linking.addEventListener('url', ({ url }) => handleDeepLink(url));
+
+
+    return () => {
+      Linking.removeEventListener('url', handleDeepLink);
+    };
+  }, []);
+ 
+
+
+  useEffect(() => {
+    redireccionarPantalla(shareEvent);
+  }, [shareEvent])
+
+  useEffect(() => {
+    if(authenticated && eventAfterLogin){
+      redireccionarPantalla(eventAfterLogin);
+    }    
+  }, [authenticated])
+  
+  const registerForPushNotificationsAsync = async () => {
+       let token
+       if (Platform.OS === 'android') {
+         await Notifications.setNotificationChannelAsync('default', {
+           name: 'default',
+           importance: Notifications.AndroidImportance.MAX,
+           vibrationPattern: [0, 250, 250, 250],
+           lightColor: '#FF231F7C',
+         });
+       
+        const { status: existingStatus } = await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+        if (existingStatus !== 'granted') {
+          const { status } = await Notifications.requestPermissionsAsync();
+          finalStatus = status;}
+        if (finalStatus !== 'granted') {
+          alert('Failed to get push token for push notification!');
+          return;
+        }         
+        token = (await Notifications.getExpoPushTokenAsync()).data;
+       return token;
+      }
+    }
+
+    const removeNotificationSubscription = (subs) => {
+     Notifications.removeNotificationSubscription(subs);
+    }
+   
+    useEffect(() => {
+      registerForPushNotificationsAsync().then(token => {
+       setExpoPushToken(token)
+      }
+       )
+       const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+        setData(response.notification.request.content.data);
+        setnewNotification(true);
+        redireccionarPantalla(response.notification.request.content.data);
+        return () => subscription.remove();
+
+      });
+      notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+        setNotification(notification);
+      })
+      
+      return () => {
+        removeNotificationSubscription(notificationListener.current);
+      };
+    }, [])
+
+    const redireccionarPantalla = (data) => {
+      
+      setEventAfterLogin(null);
+      if (data?.notification_type == 'reminder'){
+        navigationRef.navigate('EventDetail', data.event_id);  
+      }
+      if (data?.notification_type == 'modifications'){
+        if(data.modifications.status== 'cancelled' || data.modifications.status== 'suspended'){
+          navigationRef.navigate('LinkInvalidEventsScreen', data);  
+        }else{
+          navigationRef.navigate('EventPreview', data);  
+        }
+        
+      }
+      if(data?.notification_type == 'shared'){
+        if(data.modifications.status != 'active'){
+          navigationRef.navigate('LinkInvalidEventsScreen', data); 
+        }else{
+          if(authenticated){
+            navigationRef.navigate('EventDetail', data.event_id);
+          }else{
+            setEventAfterLogin(data);
+            navigationRef.navigate('EventPreview', data);  
+          }
+        }
+
+      } 
+    }
+
+    const notificationHandlerRama = ()=>{
+      if(newNotification){
+        setnewNotification(false)
+        redireccionarPantalla(data)
+      }
+      
+    } ;
   return (
+    <NotificationContext.Provider value={notification}>
+     <TokenContext.Provider value={expoPushToken}>
     <LoginContext.Provider value={{ authenticated, setAuthenticated }}>
       <NativeBaseProvider>
           
-          <NavigationContainer >
+          <NavigationContainer ref={navigationRef} onReady={notificationHandlerRama} >
             {authenticated ? 
                         <MainStack.Navigator >
                         <MainStack.Screen 
                           name="AuthStack" component={AuthenticatedBottomTab} options={{ headerShown: false }}
                         />
                       <MainStack.Screen name="EventDetail" component={EventDetail} options={{ headerShown: false}}/>
+                      <MainStack.Screen name="EventPreview" component={EventPreview} options={{ headerShown: false}}/>
                       <MainStack.Screen name="VerQR" component={TicketQr} options={{ headerShown: false}}/>
-
+                      <MainStack.Screen name="LinkInvalidEventsScreen" component={LinkInvalidEventsScreen} options={{ headerShown: false}}/>
                     </MainStack.Navigator>
             :
               <notAuthenticatedNavigator.Navigator screenOptions={{ headerShown: false }}>
                 <notAuthenticatedNavigator.Screen name="Loggin" component={LogginScreen}  options={{ }}/>
-                              
+                <notAuthenticatedNavigator.Screen name="EventPreview" component={EventPreview}  options={{ }}/>
+                <notAuthenticatedNavigator.Screen name="LinkInvalidEventsScreen" component={LinkInvalidEventsScreen} options={{ headerShown: false}}/>
               </notAuthenticatedNavigator.Navigator>
               
             }
+            
             <StatusBar style="light" />
           </NavigationContainer>
           </NativeBaseProvider>
       
     </LoginContext.Provider>
-        
+          </TokenContext.Provider>
+          </NotificationContext.Provider>
   );
 }
+
+

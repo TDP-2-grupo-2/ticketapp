@@ -2,6 +2,7 @@ import AppConstants from "../constants/AppConstants";
 import { getFirebaseImage } from '../utils/FirebaseHandler';
 import axios from "axios";
 import { ConstructionOutlined } from "@mui/icons-material";
+import { async } from "@firebase/util";
 
 
 export async function getEvent(setEvents,eventId ){
@@ -17,17 +18,12 @@ export async function getEvent(setEvents,eventId ){
                     try{
                         imageURI = await getFirebaseImage("files/"+jsonResponse.data.message.photos[0]);
                     }catch(exception){
-                        console.log(exception)
                         //Image not available
                         imageURI = "https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-1-scaled.png";
                     }
                 let tags = [];
                 if (jsonResponse.data.message.tags){
                     
-                    // for(let j=0; j<jsonResponse.data.message.tags.length; j++){
-                    //     console.log(jsonResponse.data.message.tags[j])
-                    //     tags.push(jsonResponse.data.message.tags[j]);
-                    // }
                 }
                 let startTime = jsonResponse.data.message.start.split(':');
                 startTime = startTime[0]+ ':'+ startTime[1];
@@ -37,11 +33,11 @@ export async function getEvent(setEvents,eventId ){
                 let date = jsonResponse.data.message.dateEvent.split('-');
                 let day = parseInt(date[2]) ;
                 let month = parseInt(date[1]);
-
+                
                 setEvents({
                     eventId: jsonResponse.data.message._id.$oid,
                     eventName: jsonResponse.data.message.name,
-                    owner: jsonResponse.data.message.owner,
+                    owner: jsonResponse.data.message.ownerName,
                     description: jsonResponse.data.message.description,
                     locationDescription: jsonResponse.data.message.locationDescription,
                     
@@ -77,7 +73,6 @@ export async function reserveTicket(userId, eventId,setTicket ){
         setTicket({ticketId: jsonResponse.data.message._id.$oid});
       })
       .catch(function (error) {
-        console.log('error')
         // handle error
             setTicket({})
       })
@@ -85,19 +80,40 @@ export async function reserveTicket(userId, eventId,setTicket ){
 }
 
 export async function getTicket(userId, eventId, setTicket){
-    console.log("consulto");
-
     const jsonResponse = await axios.get(
         `${AppConstants.API_URL}/events/reservations/user/${userId}/event/${eventId}`,//cambiar x el optener
     )
     .then(function (jsonResponse) {
-        //console.log(jsonResponse.data.message._id.$oid);
-
-        setTicket({ticketId: jsonResponse.data.message._id.$oid});
+        let status = jsonResponse.data.message.status;
+        switch (status) {
+            case 'to_be_used':
+                status = "Disponible"
+              break;
+            case 'suspended':
+                status = "Suspendido"
+              break;
+            case 'canceled':
+                status = "Cancelado"
+              break;
+            case 'used':
+                status = "Utilizada"
+              break;
+            case 'blocked':
+                status = "Blockeado"
+              break;
+            case 'blocked':
+                status = "Blockeado"
+              break;
+          }
+        setTicket({ticketId: jsonResponse.data.message._id.$oid,
+            eventDate:jsonResponse.data.message.event_date, 
+            event_id:jsonResponse.data.message.event_id, 
+            event_name:jsonResponse.data.message.event_name, 
+            event_start_time:jsonResponse.data.message.event_start_time, 
+            status:status
+        });
       })
       .catch(function (error) {
-        console.log('error')
-        // handle error
             setTicket({})
       })
       ;
@@ -125,4 +141,28 @@ export async function pachIsFavorite(userId, eventId, setFavorite){
             setFavorite(jsonResponse.data.message == "Se agregó como favorito el evento") ;
         }
     }
+}
+
+export async function reportEvent(authToken,reportData, setSucces, setError ,setErrorMessagge){
+
+        const jsonResponse = await axios.post(
+          `${AppConstants.API_URL}/attendees/report/event`,
+          {
+            event_id:reportData?.eventId,
+            reason:reportData?.reportType,
+          },{
+            headers: {'Authorization': `Bearer ${authToken}`}
+          }
+      ).then(function (response) {
+        // handle success
+        setSucces(true)
+      })
+      .catch(function (error) {
+        
+        setError(true);
+   
+        setErrorMessagge(error.response.data.detail);
+    
+      })
+      
 }

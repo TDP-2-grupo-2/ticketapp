@@ -6,8 +6,17 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "scheme": "TicketApp",
-    
+    "scheme": "ticketapp",
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "expo-post-publish.js",
+          "config": {
+            "redirectUri": "https://example.com/"
+          }
+        }
+      ]
+    },
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -21,6 +30,7 @@
       "bundleIdentifier": "com.TicketApp.appMobile"
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "package": "com.TicketApp.appMobile",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
@@ -41,6 +51,19 @@
         {
           "RNMapboxMapsImpl": "mapbox",
           "RNMapboxMapsDownloadToken": "sk.eyJ1IjoicmFtaXJvLXNhbmNoZXoiLCJhIjoiY2xndmF2YXM5MDBheTNrbXZiMTRiaThyOSJ9.15lE2tLkzZuuLvSobTxvOA"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon_noti.png",
+          "color": "#ffffff"
+        }
+      ],
+      [
+        "expo-calendar",
+        {
+          "calendarPermission": "TicketApp necesita acceso para acceder a tu Calendario."
         }
       ]
     ]

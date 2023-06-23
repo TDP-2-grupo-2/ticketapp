@@ -1,6 +1,7 @@
 import { async } from "@firebase/util";
 import axios from "axios";
 import ApiKeys from "../constants/ApiKeys";
+import { LoginContext } from '../context/LoginContext';
 
 import {
     GoogleSignin,
@@ -8,7 +9,7 @@ import {
     statusCodes,
   } from '@react-native-google-signin/google-signin';
 import AppConstants from "../constants/AppConstants";
-import ApiKeys from "../constants/ApiKeys";
+
 
   
   
@@ -45,7 +46,6 @@ export async function  signIn(setCredentials) {
     clientId:"81707602976-aoopf7lgorp5glk584qsac1seclq6a4t.apps.googleusercontent.com",
     androidClientId: '81707602976-05sq5for64h90arqjk20k1ocge5804m2.apps.googleusercontent.com',
   });
-    //console.log(setCredentials)
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
@@ -75,3 +75,27 @@ export async function  signIn(setCredentials) {
       }
     }
   };
+
+
+  export async function registerDevice( authToken, device){
+
+    // console.log("persona" + authToken)
+
+    // console.log("Dispositivo" +device)
+    if(authToken){
+      const jsonResponse = await axios.post(
+        `${AppConstants.API_NOTIF_URL}/notifications/new_user`,
+        {
+          device_token:device,
+        },{
+          headers: {'Authorization': `Bearer ${authToken}`}
+        }
+    ).catch(function (error) {
+      
+      // console.log(error.response)
+  
+    })
+    }
+
+
+  }
