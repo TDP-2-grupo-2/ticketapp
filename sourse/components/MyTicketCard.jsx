@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from 'react';
+import React, { useEffect,useState ,useContext} from 'react';
 
 import * as Calendar from 'expo-calendar';
 
@@ -9,12 +9,15 @@ import { SearchCard } from './SearchCard'
 import Colors from '../constants/Colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ModalAccept } from './ModalAccept';
+import { LoginContext } from '../context/LoginContext';
+import { setCalendar } from '../presenters/MyTickets';
 
 export const MyTicketCard = ({event}) => {
-  const [granted, setGranted] = useState(false)
-const [eventIdInCalendar, setEventIdInCalendar] = useState("") 
 const [toggle, setToggle] = useState(false)
-
+const { authenticated } = useContext(LoginContext);
+const [agended, setAgended] = useState(event.agended);
+const [granted, setGranted] = useState(false)
+const [eventIdInCalendar, setEventIdInCalendar] = useState("") 
   const openCalenarRequest = async () => {
     const {status} = await Calendar.requestCalendarPermissionsAsync();
     if (status === "granted") {
@@ -28,32 +31,37 @@ const eventDetails = {
   };
 useEffect(()=>{
   openCalenarRequest() // Ask for Premission to access phone calendar
+  
 },[])
 const addEventToCalendar = async () => {
-  console.log(event)
+  //console.log(event)
   if(event?.status == 'active'){
     let calendarEvent = {
       title: event.eventName, 
       startDate:new Date(event.dateEvent + ' ' + event.start) ,
       endDate: new Date(event.dateEvent + ' ' + event.end),
       };
-    console.log(calendarEvent);
+    //console.log(calendarEvent);
     const eventIdInCalendar = await Calendar.createEventAsync("1",calendarEvent)
     Calendar.openEventInCalendar(eventIdInCalendar)// that will give the user the ability to access the event in phone calendar 
     setEventIdInCalendar(eventIdInCalendar)
+    if(eventIdInCalendar){
+      setCalendar(authenticated.token,event.eventId, setAgended)
+    }
     
   }else{
     setToggle(true);
   }
 
  }
+
   return (<View>
       <SearchCard event = {event}> </SearchCard>
   <TouchableOpacity onPress={addEventToCalendar}   style={{ paddingHorizontal:10, display:'flex',
                     backgroundColor:Colors.SOMBREADO,
                     borderRadius:25, width:50,
                     height: 40, width: 40, alignItems: 'center', alignContent: 'center', justifyContent: 'center', left: '80%', bottom: '15%', position: 'absolute'}}>
-      <MaterialCommunityIcons name={event.agended? "calendar-check":"calendar-plus"} size={20} color={Colors.WHITE} />
+      <MaterialCommunityIcons name={agended? "calendar-check":"calendar-plus"} size={20} color={Colors.WHITE} />
       
       
     </TouchableOpacity>

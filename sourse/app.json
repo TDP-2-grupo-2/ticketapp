@@ -6,8 +6,17 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "scheme": "TicketApp",
-    
+    "scheme": "ticketapp",
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "expo-post-publish.js",
+          "config": {
+            "redirectUri": "https://example.com/"
+          }
+        }
+      ]
+    },
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",

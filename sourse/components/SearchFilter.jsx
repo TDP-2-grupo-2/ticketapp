@@ -107,12 +107,17 @@ export const SearchFilter = ({onSubmitFilters}) => {
                             textAlign:'center',
                             }}>Filtros</Text>
                     </View>
+                    
                     <TextInput  
                     style={InputStyle}
                     placeholder={"Nombre Evento"}
                     value={filtros.name}
                     placeholderTextColor="gray"
                     onChangeText={(value) => {setFiltros({...filtros,'name':value})}}/>
+
+                    <View style={{marginHorizontal:'8%'}}>
+                        <Text style={{color:Colors.WHITE, fontSize:18,marginVertical:5}}>Categorias:</Text>
+                    </View>
                     <Picker
                         selectedValue={filtros.eventType}
                         style={PickerStyle}
@@ -123,7 +128,7 @@ export const SearchFilter = ({onSubmitFilters}) => {
                         {categories.map((category) => <Picker.Item key={category} style={{color:Colors.BLACK}} label={category} value={category} />)}
                     </Picker>
                     <View style={{marginHorizontal:'8%'}}>
-                        <Text style={{color:Colors.WHITE, fontSize:20,marginBottom:15}}>Distancia:</Text>
+                        <Text style={{color:Colors.WHITE, fontSize:18,marginBottom:15}}>Distancia:</Text>
                         <View style={{justifyContent:'space-between', flexDirection:'row', }}>
                         <Text style={{color:Colors.WHITE}}>Minima: {filtroDistancia.min}Km</Text>
                         <Text style={{color:Colors.WHITE}}>Máxima: {filtroDistancia.max}Km</Text>

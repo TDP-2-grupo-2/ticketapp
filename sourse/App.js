@@ -27,6 +27,9 @@ import { TokenContext } from './context/TokenContext';
 import { registerDevice } from './presenters/Sesion';
 import { EventPreview } from './screens/EventPreview';
 import { LinkInvalidEventsScreen } from './screens/LinkInvalidEventsScreen';
+import * as Linking from 'expo-linking';
+
+import { getEvent, getShareEvent } from './presenters/HomePresenter';
 
 
 
@@ -103,9 +106,62 @@ export default function App() {
   //const [navigationRef, setNavigationRef] = useState(null);
   const navigationRef = useNavigationContainerRef();
   const [data, setData] = useState(null);
-  const [newNotification, setnewNotification] = useState(false)
+  const [newNotification, setnewNotification] = useState(false);
+  const [shareEvent, setShareEvent] = useState(null);
+  const [eventAfterLogin, setEventAfterLogin] = useState(null)
+  const [url, setUrl] = useState(null)
+
+  
+  // if (url) {
+  //   const { hostname, path, queryParams } = Linking.parse(url);
+
+  //   console.log(
+  //     `Linked to app with hostname: ${hostname}, path: ${path} and data: ${JSON.stringify(
+  //       queryParams
+  //     )}`
+  //   );
+  //   getShareEvent(setShareEvent,queryParams.event_id);
+    
+  // }
+  // const redirectEvent = async () =>{
+    
+  // }
+  useEffect(() => {
+    if(url){
+      const { queryParams } = Linking.parse(url);
+      getShareEvent(setShareEvent,queryParams.event_id);
+    }
+  
+  }, [url])
+  
+  const handleDeepLink = async (url) => {
+    setUrl(url)
+  };
+  useEffect(() => {
 
 
+
+    // Agregar el listener para detectar deep links
+    Linking.addEventListener('url', ({ url }) => handleDeepLink(url));
+
+
+    return () => {
+      Linking.removeEventListener('url', handleDeepLink);
+    };
+  }, []);
+ 
+
+
+  useEffect(() => {
+    redireccionarPantalla(shareEvent);
+  }, [shareEvent])
+
+  useEffect(() => {
+    if(authenticated && eventAfterLogin){
+      redireccionarPantalla(eventAfterLogin);
+    }    
+  }, [authenticated])
+  
   const registerForPushNotificationsAsync = async () => {
        let token
        if (Platform.OS === 'android') {
@@ -136,9 +192,7 @@ export default function App() {
    
     useEffect(() => {
       registerForPushNotificationsAsync().then(token => {
-       console.log(token)
        setExpoPushToken(token)
-       //registerDevice(authenticated?.token , token);
       }
        )
        const subscription = Notifications.addNotificationResponseReceivedListener(response => {
@@ -158,15 +212,32 @@ export default function App() {
     }, [])
 
     const redireccionarPantalla = (data) => {
+      
+      setEventAfterLogin(null);
       if (data?.notification_type == 'reminder'){
         navigationRef.navigate('EventDetail', data.event_id);  
       }
       if (data?.notification_type == 'modifications'){
-        if(data.modifications.status== 'cancelled' || data.modifications.status== 'suspended')
-        navigationRef.navigate('LinkInvalidEventsScreen', data);  
-      }else{
-        navigationRef.navigate('EventPreview', data);  
+        if(data.modifications.status== 'cancelled' || data.modifications.status== 'suspended'){
+          navigationRef.navigate('LinkInvalidEventsScreen', data);  
+        }else{
+          navigationRef.navigate('EventPreview', data);  
+        }
+        
       }
+      if(data?.notification_type == 'shared'){
+        if(data.modifications.status != 'active'){
+          navigationRef.navigate('LinkInvalidEventsScreen', data); 
+        }else{
+          if(authenticated){
+            navigationRef.navigate('EventDetail', data.event_id);
+          }else{
+            setEventAfterLogin(data);
+            navigationRef.navigate('EventPreview', data);  
+          }
+        }
+
+      } 
     }
 
     const notificationHandlerRama = ()=>{
@@ -196,7 +267,8 @@ export default function App() {
             :
               <notAuthenticatedNavigator.Navigator screenOptions={{ headerShown: false }}>
                 <notAuthenticatedNavigator.Screen name="Loggin" component={LogginScreen}  options={{ }}/>
-                              
+                <notAuthenticatedNavigator.Screen name="EventPreview" component={EventPreview}  options={{ }}/>
+                <notAuthenticatedNavigator.Screen name="LinkInvalidEventsScreen" component={LinkInvalidEventsScreen} options={{ headerShown: false}}/>
               </notAuthenticatedNavigator.Navigator>
               
             }

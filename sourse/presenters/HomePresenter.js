@@ -81,3 +81,39 @@ export async function getFireBaseImageWithSetImage(image_path, setImage){
     }
     setImage(imageURI)
 }
+
+
+
+export async function getShareEvent(setEvents,eventId ){
+    console.log(eventId);
+
+    const jsonResponse = await axios.get(
+        `${AppConstants.API_URL}/events/${eventId}`,
+    ).then(function (response) {
+        setEvents({
+            notification_type:'shared',
+            event_id: response.data.message._id.$oid,
+            eventName: response.data.message.name,
+            modifications: {
+                status: response.data.message.status
+            },
+            notFound: false
+            });
+      })
+    .catch(function (error) {
+      
+        setEvents({
+            notification_type:'shared',
+            event_id: null,
+            eventName: null,
+            modifications: {
+                status: null
+            },    
+            status: null,
+            notFound: true
+        })
+        
+      })
+
+    
+}

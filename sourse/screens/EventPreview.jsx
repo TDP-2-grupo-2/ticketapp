@@ -1,27 +1,18 @@
 import React, { useEffect, useState ,useContext} from 'react'
-import { Button, Image, ImageBackground, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ImageBackground, ScrollView, StyleSheet, Text, View } from 'react-native'
 import Colors from '../constants/Colors'
-import { getFireBaseImage } from '../presenters/HomePresenter';
 import { SmallCalendar } from '../components/SmallCalendar';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Avatar } from "native-base";
-import Stack from '@mui/material/Stack';
-import { getEvent , reserveTicket, getTicket, pachIsFavorite, getIsFavorite} from '../presenters/EventDetail';
-import { TouchableHighlight } from 'react-native';
+import { getEvent } from '../presenters/EventDetail';
 import { TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Fontisto } from '@expo/vector-icons'; 
 import { FrequentQuestion } from '../components/FrequentQuestion';
-import MapView, { UrlTile } from 'react-native-maps';
-import { Feather } from '@expo/vector-icons'; 
-import {Marker} from 'react-native-maps';
 import { ModalAccept } from '../components/ModalAccept';
 import { LoginContext } from '../context/LoginContext';
 import { AgendaItem } from '../components/AgendaItem';
-
+import { AntDesign } from '@expo/vector-icons';
 import MapboxGL from '@rnmapbox/maps';
-import { ReportsModal } from '../components/ReportsModal';
 import { registerDevice } from '../presenters/Sesion';
 
 MapboxGL.setAccessToken('pk.eyJ1IjoicmFtaXJvLXNhbmNoZXoiLCJhIjoiY2xndjlkc3YzMG80NTNwa2xsc3FudGloaSJ9.Fr6JzzPfoSbp-UnxuEr_HA');
@@ -35,7 +26,6 @@ const TitleStyle = {
   marginVertical: 10,
   color:Colors.WHITE, 
   fontSize:20,  
-  //marginTop:20, 
   marginBottom:10,
   fontWeight:'bold'
 }
@@ -91,22 +81,19 @@ export const EventPreview = ({route}) => {
       await getEvent(setEvent, route.params.event_id)
       console.log(modificaciones)
       if(modificaciones){
-        //setEvent({...event,...modificaciones})
         setModifications(modificaciones)
       }
       console.log(modifications)
-      //getTicket()r
     }
     useEffect( () => {
-      //console.log(route.params.modifications)
+        console.log(route)
          initDetail(route.params.modifications)
     }, [])
     
     useEffect(() => {
       if(event.eventId){
         setFecha(event.dateEvent)
-        // getIsFavorite(authenticated.token,event.eventId, setIsFavorite);
-        // getTicket(authenticated.token,event.eventId, setTicket);
+
       }
 
     }, [event])
@@ -145,10 +132,10 @@ export const EventPreview = ({route}) => {
         <View>
         <Text  style={{color:Colors.TEXT_SEC, fontSize:13}}>{event.eventType}</Text>
           <Text  style={{color:Colors.WHITE, fontSize:26}}>{event.eventName}</Text>
-          <Text  style={[{ color:Colors.TEXT_SEC, fontSize:13},modifications?.description? styles.editText:{} ]}>Desde: {event.start} hasta: {event.end}</Text>
+          <Text  style={[{ color:Colors.TEXT_SEC, fontSize:13},modifications?.startTime|| modifications?.endTime ? styles.editText:{} ]}>Desde: {event.start} hasta: {event.end}</Text>
         </View>
 
-        <SmallCalendar day={event.day} month={event.month} style={{backgroundColor:Colors.PURPLE_BUTTOM}}  ></SmallCalendar>
+        <SmallCalendar day={event.day} month={event.month} style={modifications?.dateEvent?{backgroundColor:Colors.PURPLE_BUTTOM}:{}}  ></SmallCalendar>
         </View>
     </View>
     <View >
@@ -235,7 +222,7 @@ export const EventPreview = ({route}) => {
     </View>
     <ModalAccept toggle={toggle} header='¡Genial!' bodyText='Acabas de reservar tu entrada' setToggle = {setToggle}></ModalAccept>
     
-    {!authenticated.token ? 
+    {!authenticated ? 
     <View style={[NavbarStyle,{}]}>
     <View style={{marginLeft:'10%'}}>
       <Text style={event.capacity > event.attendance?whithVacants :whithNoVacants }>Vacantes</Text>
@@ -243,10 +230,11 @@ export const EventPreview = ({route}) => {
     </View>
     
       
-    <TouchableOpacity style={styles.google} onPress={async () => { await onPressButton()}}>
-  <AntDesign name="google" size={24} color="blue" />
-    <Text style={{marginLeft:10, color:'blue', fontWeight:'bold'}}>iniciar sesión con google</Text>
-    </TouchableOpacity>
+    <TouchableOpacity  onPress={() => {navigator.goBack()}} style={{ paddingHorizontal:10, marginVertical:'5%',marginRight:20,
+    paddingVertical:10, backgroundColor:Colors.PURPLE_BUTTOM,
+      borderRadius:15,}}>
+          <Text style={{color:Colors.WHITE ,textAlign:'center',  fontSize:18}}>¡Ingresa aqui!</Text>
+      </TouchableOpacity>
       
 
     

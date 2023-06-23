@@ -116,7 +116,10 @@ export const ReportsModal = ({eventId}) => {
                             textAlign:'center',
                             }}>Reportar Evento</Text>
                     </View>
-
+                    
+                                        <View style={{marginHorizontal:'8%'}}>
+                        <Text style={{color:Colors.WHITE, fontSize:18,marginVertical:5}}>Tipos de reporte:</Text>
+                    </View>
                     <Picker
                         selectedValue={filtros.reportType}
                         style={PickerStyle}

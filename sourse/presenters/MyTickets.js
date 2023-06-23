@@ -11,9 +11,11 @@ export async function getEvents(userId, setEvents ){
         `${AppConstants.API_URL}/events/reservations/user/${userId}`,
     );
     const Events = [];
+    
     if (jsonResponse.status === 200){
         if(!jsonResponse.status_code){
             for(let i=0; i<jsonResponse.data.message.length; i++){
+                console.log(jsonResponse.data.message[i])
                 let imageURI;
                     try{
                         imageURI = await getFirebaseImage("files/"+jsonResponse.data.message[i].photos[0]);
@@ -44,9 +46,30 @@ export async function getEvents(userId, setEvents ){
                     month: month,
                     start: jsonResponse.data.message[i].start,
                     end: jsonResponse.data.message[i].end,
+                    agended: jsonResponse.data.message[i].calendar,
                 });
             }
         }
     } 
     setEvents(Events)  
+}
+
+export async function setCalendar(token, event_id,setAgended){
+    const jsonResponse = await axios.patch(
+        
+        `${AppConstants.API_URL}/events/reservations/event/${event_id}/calendar`,
+        {},
+        {
+            headers: {'Authorization': `Bearer ${token}`}
+        },
+    )  .then(function (response) {
+        // handle success
+        setAgended(true)
+      })
+      .catch(function (error) {
+        setError(true);
+        console.log(error.response.data)
+        setErrorMessage(error.response.data.detail);
+      })
+
 }

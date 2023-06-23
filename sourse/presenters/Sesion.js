@@ -46,7 +46,6 @@ export async function  signIn(setCredentials) {
     clientId:"81707602976-aoopf7lgorp5glk584qsac1seclq6a4t.apps.googleusercontent.com",
     androidClientId: '81707602976-05sq5for64h90arqjk20k1ocge5804m2.apps.googleusercontent.com',
   });
-    //console.log(setCredentials)
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
@@ -80,9 +79,9 @@ export async function  signIn(setCredentials) {
 
   export async function registerDevice( authToken, device){
 
-    console.log("persona" + authToken)
+    // console.log("persona" + authToken)
 
-    console.log("Dispositivo" +device)
+    // console.log("Dispositivo" +device)
     if(authToken){
       const jsonResponse = await axios.post(
         `${AppConstants.API_NOTIF_URL}/notifications/new_user`,
@@ -93,7 +92,7 @@ export async function  signIn(setCredentials) {
         }
     ).catch(function (error) {
       
-      console.log(error.response)
+      // console.log(error.response)
   
     })
     }

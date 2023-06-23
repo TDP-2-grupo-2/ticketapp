@@ -1,5 +1,5 @@
 import React, { useEffect, useState ,useContext} from 'react'
-import { Button, Image, ImageBackground, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Button, Image, ImageBackground, ScrollView, Share, StyleSheet, Text, View } from 'react-native'
 import Colors from '../constants/Colors'
 import { getFireBaseImage } from '../presenters/HomePresenter';
 import { SmallCalendar } from '../components/SmallCalendar';
@@ -22,6 +22,7 @@ import { AgendaItem } from '../components/AgendaItem';
 
 import MapboxGL from '@rnmapbox/maps';
 import { ReportsModal } from '../components/ReportsModal';
+import { ShareButtom } from '../components/ShareButtom';
 
 MapboxGL.setAccessToken('pk.eyJ1IjoicmFtaXJvLXNhbmNoZXoiLCJhIjoiY2xndjlkc3YzMG80NTNwa2xsc3FudGloaSJ9.Fr6JzzPfoSbp-UnxuEr_HA');
 
@@ -93,6 +94,7 @@ export const EventDetail = ({route}) => {
       //getTicket()
     }
     useEffect( () => {
+      console.log(route);
        initDetail()
     }, [])
     
@@ -120,9 +122,12 @@ export const EventDetail = ({route}) => {
       navigator.navigate('VerQR', {...ticket, eventName: event.eventName,start:event.start ,end:event.end,day:event.day,month:event.month })
     }
     
-    const denunciarEvento = () => {
-      console.log('asdsad');
-    }
+
+
+    
+      //console.log('estas dentro de la funcion')
+
+    
 
   return (
     <View>
@@ -250,9 +255,7 @@ export const EventDetail = ({route}) => {
     <TouchableOpacity  onPress={() =>{onFavoritePress()}} >
       <Ionicons  name={isFavorite? "heart":"heart-outline"}  style={{marginRight:10}} color={Colors.WHITE} size={30}></Ionicons>
     </TouchableOpacity>
-    <TouchableOpacity  >
-      <Ionicons  name="paper-plane-outline" color={Colors.WHITE} size={30}></Ionicons>
-    </TouchableOpacity>
+    <ShareButtom event={event}></ShareButtom>
     </View>
     
     </View>
